@@ -21,10 +21,11 @@ class CbssSpider(scrapy.Spider):
         yield scrapy.Request(self.login_url, callback=self.login)
 
     def login(self, response):
-        driver = webdriver.Ie()
+        driver = webdriver.Ie("C:\Program Files (x86)\Internet Explorer\IEDriverServer.exe")
         driver.get(self.login_url)
-        time.sleep(10)
-        logging.debug(response.css(".li.userInfo"))
+        time.sleep(15)
+        logging.debug("------start------")
+        print (driver.find_element_by_css_selector('ul.clear'))
         WebDriverWait(driver, 1000).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.li.userInfo')))
         logging.debug("恭喜您，您已登录成功了！")
         logging.debug("------------")
