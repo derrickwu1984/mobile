@@ -24,8 +24,8 @@ class CbssSpider(scrapy.Spider):
     # driver_path="Z:\BaiduNetdiskDownload\IEDriverServer.exe"
     driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
-    userName="sdsc-xingyy7"
-    passWd="BySh@2019"
+    userName=""
+    passWd=""
 
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
