@@ -24,8 +24,8 @@ class CbssSpider(scrapy.Spider):
     # driver_path="Z:\BaiduNetdiskDownload\IEDriverServer.exe"
     driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
-    userName=""
-    passWd=""
+    userName="sdsc-xingyy7"
+    passWd="BySh@2019"
 
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
@@ -40,9 +40,33 @@ class CbssSpider(scrapy.Spider):
         Select(driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value("17")
         logging.debug("------start------")
         WebDriverWait(driver, 1000).until(EC.url_to_be(self.initmy_url))
+        driver.implicitly_wait(3)
         logging.debug("恭喜您，您已登录成功了！")
-        res =driver.page_source
-        logging.debug(res)
+        # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
+        driver.switch_to.frame("navframe")
+        time.sleep(25)
+        logging.debug("========first menu click response==========")
+        logging.debug(driver.page_source)
+        # 获取财务管理a标签
+        fmQuery_1 = driver.find_element_by_xpath("//li/a[@id='FIRST_MENU_LINK_BIL6000']")
+        # logging.debug("=====================fmQuery_1===============")
+        # logging.debug(fmQuery_1)
+        fmQuery_1.click()
+        time.sleep(25)
+        logging.debug("========second menu click response==========")
+        logging.debug(driver.page_source)
+        # 获取财管查询a标签
+        fmQuery_2 = driver.find_element_by_xpath("//div[@class='nav2 e_clearfix']/ul/li[12]/a")
+        time.sleep(3)
+        logging.debug(fmQuery_2)
+        fmQuery_2.click()
+        # time.sleep(15)
+        # logging.debug("========third click response==========")
+        # logging.debug(driver.page_source)
+
+
+
+
         cookies_dict = {}
         cookies = driver.get_cookies()
         for cookie in cookies:
