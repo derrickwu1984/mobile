@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy,logging,requests,time
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.keys import Keys
 from scrapy.http import Request
 from urllib import parse
 from lxml import etree
@@ -24,8 +25,9 @@ class CbssSpider(scrapy.Spider):
     # driver_path="Z:\BaiduNetdiskDownload\IEDriverServer.exe"
     driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
-    userName=""
-    passWd=""
+    userName="sdsc-xingyy7"
+    passWd="BySh@2019"
+    js_method="clickMenuItem(this);openmenu('/acctmanm?service=page/amarchquery.queryaccountbill.QueryAccountBill&listener=myInitialize&RIGHT_CODE=BIL651P&LOGIN_RANDOM_CODE=1548903104099624120380&LOGIN_CHECK_CODE=201901311746371775&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531');"
 
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
@@ -45,28 +47,30 @@ class CbssSpider(scrapy.Spider):
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
         driver.switch_to.frame("navframe")
         time.sleep(25)
-        logging.debug("========first menu click response==========")
+        first_menu = driver.find_element_by_id("FIRST_MENU_LINK_BIL6000")
+        logging.warning("==========first_menu_assert===========")
+        assert first_menu.is_displayed()
+        first_menu.click()
+        logging.debug("==========after click first_menu response==============")
         logging.debug(driver.page_source)
-        # 获取财务管理a标签
-        fmQuery_1 = driver.find_element_by_xpath("//li/a[@id='FIRST_MENU_LINK_BIL6000']")
-        # logging.debug("=====================fmQuery_1===============")
-        # logging.debug(fmQuery_1)
-        fmQuery_1.click()
-        time.sleep(25)
-        logging.debug("========second menu click response==========")
+        time.sleep(30)
+        second_menu=driver.find_element_by_id("SECOND_MENU_LINK_BIL6500")
+        logging.warning("==========second_menu===========")
+        logging.warning(second_menu)
+        for i in range(3):
+            try:
+                assert second_menu.is_displayed()
+            except :
+                logging.error("no Element displayed")
+            else:
+                second_menu.click()
+        logging.debug("==========after click second_menu response==============")
         logging.debug(driver.page_source)
-        # 获取财管查询a标签
-        fmQuery_2 = driver.find_element_by_xpath("//div[@class='nav2 e_clearfix']/ul/li[12]/a")
-        time.sleep(3)
-        logging.debug(fmQuery_2)
-        fmQuery_2.click()
-        # time.sleep(15)
-        # logging.debug("========third click response==========")
-        # logging.debug(driver.page_source)
-
-
-
-
+        # driver.execute_script(self.js_method)
+        # logging.warning(driver.execute_script(self.js_method))
+        # a_tag=driver.find_element_by_id("BIL651P")
+        # logging.warning(a_tag)
+        # a_tag.click()
         cookies_dict = {}
         cookies = driver.get_cookies()
         for cookie in cookies:
@@ -83,7 +87,4 @@ class CbssSpider(scrapy.Spider):
         # yield scrapy.Request(url=self.initmy_url, callback=self.parse,headers=headers)
     def parse(self, response):
         logging.debug("=====start parse========")
-        # html = etree.HTML(response.text)
-        # ele=response.xpath("//div[@class='nav e_clearfix'])").extract()
-        # logging.debug(response.text)
         pass
