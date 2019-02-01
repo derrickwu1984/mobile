@@ -9,6 +9,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC #期望的条件
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 import time,json
 import pickle
 from PIL import Image
@@ -25,6 +27,8 @@ class CbssSpider(scrapy.Spider):
     # driver_path="Z:\BaiduNetdiskDownload\IEDriverServer.exe"
     driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
+    captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
+    captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
     userName=""
     passWd=""
     js_method="clickMenuItem(this);openmenu('/acctmanm?service=page/amarchquery.queryaccountbill.QueryAccountBill&listener=myInitialize&RIGHT_CODE=BIL651P&LOGIN_RANDOM_CODE=1548903104099624120380&LOGIN_CHECK_CODE=201901311746371775&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531');"
@@ -36,10 +40,36 @@ class CbssSpider(scrapy.Spider):
         driver = webdriver.Ie(self.driver_path)
         driver.get(self.login_url)
         time.sleep(2)
-        # driver.maximize_window()
+        builder=ActionChains(driver)
+        builder.send_keys(Keys.F12).perform()
+        time.sleep(2)
+        driver.refresh()
+        logging.debug(driver.page_source)
+        time.sleep(5)
         driver.find_element_by_id("STAFF_ID").send_keys(self.userName)
         driver.find_element_by_id("LOGIN_PASSWORD").send_keys(self.passWd)
         Select(driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value("17")
+        time.sleep(2)
+        driver.save_screenshot(self.captha_image_path)
+        locate_image=driver.find_element_by_id("captureImage").location
+        logging.warning(locate_image)
+        size_image=driver.find_element_by_id("captureImage").size
+        left=locate_image['x']
+        top=locate_image['y']
+        right=locate_image['x']+size_image['width']
+        bottom = locate_image['y']+size_image['height']
+
+        rangle=(int (left),int(top),int(right),int(bottom))
+        i = Image.open(self.captha_image_path)
+        # segment  = i.crop(rangle)
+        # segment.save(self.captha_image)
+        # i = Image.open(self.captha_image)
+        i.show()
+        captha_input=input(u"请输入验证码:")
+        VERIFY_CODE_ELE = driver.find_element_by_id("VERIFY_CODE")
+        VERIFY_CODE_ELE.send_keys(captha_input)
+        time.sleep(2)
+        driver.find_element_by_class_name("#button buttonOff").click()
         logging.debug("------start------")
         WebDriverWait(driver, 1000).until(EC.url_to_be(self.initmy_url))
         driver.implicitly_wait(3)
