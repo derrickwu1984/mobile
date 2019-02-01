@@ -25,8 +25,8 @@ class CbssSpider(scrapy.Spider):
     # driver_path="Z:\BaiduNetdiskDownload\IEDriverServer.exe"
     driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
-    userName="sdsc-xingyy7"
-    passWd="BySh@2019"
+    userName=""
+    passWd=""
     js_method="clickMenuItem(this);openmenu('/acctmanm?service=page/amarchquery.queryaccountbill.QueryAccountBill&listener=myInitialize&RIGHT_CODE=BIL651P&LOGIN_RANDOM_CODE=1548903104099624120380&LOGIN_CHECK_CODE=201901311746371775&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531');"
 
     def start_requests(self):
