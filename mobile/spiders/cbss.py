@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC #期望的条�
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from pyquery import PyQuery as pq
 import time,json
 import pickle
 from PIL import Image
@@ -41,35 +42,50 @@ class CbssSpider(scrapy.Spider):
         driver.get(self.login_url)
         time.sleep(2)
         builder=ActionChains(driver)
-        builder.send_keys(Keys.F12).perform()
+        # builder.send_keys(Keys.F12).perform()
         time.sleep(2)
         driver.refresh()
-        logging.debug(driver.page_source)
         time.sleep(5)
         driver.find_element_by_id("STAFF_ID").send_keys(self.userName)
         driver.find_element_by_id("LOGIN_PASSWORD").send_keys(self.passWd)
         Select(driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value("17")
         time.sleep(2)
-        driver.save_screenshot(self.captha_image_path)
-        locate_image=driver.find_element_by_id("captureImage").location
-        logging.warning(locate_image)
-        size_image=driver.find_element_by_id("captureImage").size
-        left=locate_image['x']
-        top=locate_image['y']
-        right=locate_image['x']+size_image['width']
-        bottom = locate_image['y']+size_image['height']
+        # driver.save_screenshot(self.captha_image_path)
+        # locate_image=driver.find_element_by_id("captureImage").location
+        # size_image=driver.find_element_by_id("captureImage").size
+        # left=locate_image['x']
+        # top=locate_image['y']
+        # right=locate_image['x']+size_image['width']
+        # bottom = locate_image['y']+size_image['height']
 
-        rangle=(int (left),int(top),int(right),int(bottom))
-        i = Image.open(self.captha_image_path)
+        # rangle=(int (left),int(top),int(right),int(bottom))
+        # i = Image.open(self.captha_image_path)
         # segment  = i.crop(rangle)
         # segment.save(self.captha_image)
         # i = Image.open(self.captha_image)
-        i.show()
+        # i.show()
         captha_input=input(u"请输入验证码:")
         VERIFY_CODE_ELE = driver.find_element_by_id("VERIFY_CODE")
         VERIFY_CODE_ELE.send_keys(captha_input)
         time.sleep(2)
-        driver.find_element_by_class_name("#button buttonOff").click()
+
+        above=driver.find_element_by_class_name("button")
+        # d=pq(url=self.login_url)
+        # logging.warning(d('.button:first'))
+        time.sleep(3)
+        # driver.execute_script("alert(123)")
+        # above.click()
+        # ActionChains(driver).move_to_element(above).click()
+        # above_class = driver.find_element_by_css_selector(".button.buttonOver")
+        # builder.send_keys(Keys.F12).perform()
+        # time.sleep(2)
+        driver.page_source
+        # assert above,"can't find above Element"
+        ActionChains(driver).move_to_element(above).click(driver.find_element_by_css_selector(".buttonOver")).perform()
+        logging.warning(driver.page_source)
+        # driver.execute_script("checkIpassState()")
+
+        # login_button = driver.find_elements_by_css_selector(".button.buttonOver")
         logging.debug("------start------")
         WebDriverWait(driver, 1000).until(EC.url_to_be(self.initmy_url))
         driver.implicitly_wait(3)
