@@ -69,24 +69,22 @@ class CbssSpider(scrapy.Spider):
         VERIFY_CODE_ELE = driver.find_element_by_id("VERIFY_CODE")
         VERIFY_CODE_ELE.send_keys(captha_input)
         time.sleep(2)
-        # above=driver.find_element_by_class_name("submit")
-        above = "var submit_div=document.getElementsByClassName('submit')[0].children[0]"
-        time.sleep(2)
-        # driver.execute_script(self.js_exec)
-
-        # driver.execute_script("checkIpassState()")
-
-        # login_button = driver.find_elements_by_css_selector(".button.buttonOver")
         logging.debug("------start------")
         WebDriverWait(driver, 30).until(EC.url_to_be(self.initmy_url))
         logging.debug("恭喜您，您已登录成功了！")
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
-
         driver.switch_to.frame("navframe")
+        time.sleep(20)
+        # logging.warning("=========first==========")
+        # logging.warning(driver.page_source)
+        js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
+        driver.execute_script(js_query_acct)
+        logging.warning("=========second==========")
         logging.warning(driver.page_source)
-        # time.sleep(25)
-        # first_menu = driver.find_element_by_id("FIRST_MENU_LINK_BIL6000")
-        # logging.warning("==========first_menu_assert===========")
+        js_query_bill = "var query_acct=document.getElementById('BIL651P').onclick()"
+        driver.execute_script(js_query_acct)
+        logging.warning("=========third==========")
+        logging.warning(driver.page_source)
         # assert first_menu.is_displayed()
         # first_menu.click()
         # logging.debug("==========after click first_menu response==============")
