@@ -33,7 +33,8 @@ class CbssSpider(scrapy.Spider):
     userName=""
     passWd=""
     js_method="clickMenuItem(this);openmenu('/acctmanm?service=page/amarchquery.queryaccountbill.QueryAccountBill&listener=myInitialize&RIGHT_CODE=BIL651P&LOGIN_RANDOM_CODE=1548903104099624120380&LOGIN_CHECK_CODE=201901311746371775&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531');"
-
+    js_exec="var but_click=document.getElementsByClassName('submit')[0].children[0].onclick"
+    # js_exec="var but_click=document.querySelector('.button')"
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
 
@@ -68,50 +69,41 @@ class CbssSpider(scrapy.Spider):
         VERIFY_CODE_ELE = driver.find_element_by_id("VERIFY_CODE")
         VERIFY_CODE_ELE.send_keys(captha_input)
         time.sleep(2)
+        # above=driver.find_element_by_class_name("submit")
+        above = "var submit_div=document.getElementsByClassName('submit')[0].children[0]"
+        time.sleep(2)
+        # driver.execute_script(self.js_exec)
 
-        above=driver.find_element_by_class_name("button")
-        # d=pq(url=self.login_url)
-        # logging.warning(d('.button:first'))
-        time.sleep(3)
-        # driver.execute_script("alert(123)")
-        # above.click()
-        # ActionChains(driver).move_to_element(above).click()
-        # above_class = driver.find_element_by_css_selector(".button.buttonOver")
-        # builder.send_keys(Keys.F12).perform()
-        # time.sleep(2)
-        driver.page_source
-        # assert above,"can't find above Element"
-        ActionChains(driver).move_to_element(above).click(driver.find_element_by_css_selector(".buttonOver")).perform()
-        logging.warning(driver.page_source)
         # driver.execute_script("checkIpassState()")
 
         # login_button = driver.find_elements_by_css_selector(".button.buttonOver")
         logging.debug("------start------")
-        WebDriverWait(driver, 1000).until(EC.url_to_be(self.initmy_url))
-        driver.implicitly_wait(3)
+        WebDriverWait(driver, 30).until(EC.url_to_be(self.initmy_url))
         logging.debug("恭喜您，您已登录成功了！")
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
+
         driver.switch_to.frame("navframe")
-        time.sleep(25)
-        first_menu = driver.find_element_by_id("FIRST_MENU_LINK_BIL6000")
-        logging.warning("==========first_menu_assert===========")
-        assert first_menu.is_displayed()
-        first_menu.click()
-        logging.debug("==========after click first_menu response==============")
-        logging.debug(driver.page_source)
-        time.sleep(30)
-        second_menu=driver.find_element_by_id("SECOND_MENU_LINK_BIL6500")
-        logging.warning("==========second_menu===========")
-        logging.warning(second_menu)
-        for i in range(3):
-            try:
-                assert second_menu.is_displayed()
-            except :
-                logging.error("no Element displayed")
-            else:
-                second_menu.click()
-        logging.debug("==========after click second_menu response==============")
-        logging.debug(driver.page_source)
+        logging.warning(driver.page_source)
+        # time.sleep(25)
+        # first_menu = driver.find_element_by_id("FIRST_MENU_LINK_BIL6000")
+        # logging.warning("==========first_menu_assert===========")
+        # assert first_menu.is_displayed()
+        # first_menu.click()
+        # logging.debug("==========after click first_menu response==============")
+        # logging.debug(driver.page_source)
+        # time.sleep(30)
+        # second_menu=driver.find_element_by_id("SECOND_MENU_LINK_BIL6500")
+        # logging.warning("==========second_menu===========")
+        # logging.warning(second_menu)
+        # for i in range(3):
+        #     try:
+        #         assert second_menu.is_displayed()
+        #     except :
+        #         logging.error("no Element displayed")
+        #     else:
+        #         second_menu.click()
+        # logging.debug("==========after click second_menu response==============")
+        # logging.debug(driver.page_source)
         # driver.execute_script(self.js_method)
         # logging.warning(driver.execute_script(self.js_method))
         # a_tag=driver.find_element_by_id("BIL651P")
