@@ -11,8 +11,8 @@ from selenium.webdriver.support import expected_conditions as EC #期望的条�
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-from pyquery import PyQuery as pq
-import time,json
+import time
+import json
 import pickle
 from PIL import Image
 from io import BytesIO
@@ -25,8 +25,8 @@ class CbssSpider(scrapy.Spider):
     # 登陆后的链接
     initmy_url = "https://sd.cbss.10010.com/essframe"
     # initmy_url = "https://sd.cbss.10010.com/abcde"
-    # driver_path="Z:\BaiduNetdiskDownload\IEDriverServer.exe"
-    driver_path = "Z:/tools/IEDriverServer.exe"
+    driver_path="D:/tools/IEDriverServer.exe"
+    # driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
     captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
     captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
@@ -34,7 +34,7 @@ class CbssSpider(scrapy.Spider):
     passWd=""
     js_exec="var but_click=document.getElementsByClassName('submit')[0].children[0].onclick"
     # js_exec="var but_click=document.querySelector('.button')"
-    reqeust_url="https://sd.cbss.10010.com/acctmanm?service=page/amarchquery.queryuserbill.QueryUserBillCBss&listener=myInitialize&RIGHT_CODE=ASMUSERTABQRY&LOGIN_RANDOM_CODE=15500242660371590672351&LOGIN_CHECK_CODE=201902131747274690&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531"
+
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
     def login(self, response):
@@ -70,7 +70,11 @@ class CbssSpider(scrapy.Spider):
         driver.execute_script(js_query_acct)
         logging.warning("=========third==========")
         CSM1001=driver.find_element_by_id("CSM1001").get_attribute("onclick")
-        logging.warning(driver.page_source)
+        CSM1001_content=CSM1001.split('&')
+        LOGIN_RANDOM_CODE =CSM1001_content[3]
+        LOGIN_CHECK_CODE=CSM1001_content[4]
+        reqeust_url = "https://sd.cbss.10010.com/acctmanm?service=page/amarchquery.queryuserbill.QueryUserBillCBss&listener=myInitialize&RIGHT_CODE=ASMUSERTABQRY&"+LOGIN_RANDOM_CODE+"&"+LOGIN_CHECK_CODE+"&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531"
+        logging.warning(reqeust_url)
         # CSM1001_js="var CSM1001_js=document.getElementById('CSM1001')"
         # CSM100123=driver.execute_script(CSM1001_js)
         requests.adapters.DEFAULT_RETRIES = 5
@@ -89,7 +93,7 @@ class CbssSpider(scrapy.Spider):
             'Host':'sd.cbss.10010.com'
             # 'cookie': dict(cookie_out)
         }
-        res=s.get(self.reqeust_url,headers=headers,cookies=cookie_out,verify= False)
+        res=s.get(reqeust_url,headers=headers,cookies=cookie_out,verify= False)
         time.sleep(5)
         logging.warning(res.content.decode('gbk'))
         # res.content
