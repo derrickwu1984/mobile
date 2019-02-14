@@ -12,7 +12,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+from lxml import etree
 import json
+import datetime
 import pickle
 from PIL import Image
 from io import BytesIO
@@ -25,8 +27,8 @@ class CbssSpider(scrapy.Spider):
     # 登陆后的链接
     initmy_url = "https://sd.cbss.10010.com/essframe"
     # initmy_url = "https://sd.cbss.10010.com/abcde"
-    driver_path="D:/tools/IEDriverServer.exe"
-    # driver_path = "Z:/tools/IEDriverServer.exe"
+    # driver_path="D:/tools/IEDriverServer.exe"
+    driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
     captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
     captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
@@ -54,20 +56,20 @@ class CbssSpider(scrapy.Spider):
         # VERIFY_CODE_ELE.send_keys(captha_input)
         # time.sleep(2)
         logging.debug("------start------")
-        WebDriverWait(driver, 30).until(EC.url_to_be(self.initmy_url))
+        WebDriverWait(driver, 1000).until(EC.url_to_be(self.initmy_url))
         logging.debug("恭喜您，您已登录成功了！")
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
         driver.switch_to.frame("navframe")
-        time.sleep(10)
+        time.sleep(30)
         # logging.warning("=========first==========")
-        # logging.warning(driver.page_source)
-        js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
+        logging.warning(driver.page_source)
+        # js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
         # driver.execute_script(js_query_acct)
-        time.sleep(3)
+        # time.sleep(3)
         # logging.warning("=========second==========")
         # logging.warning(driver.page_source)
         js_query_bill = "var query_acct=document.getElementById('BIL651P').onclick()"
-        driver.execute_script(js_query_acct)
+        driver.execute_script(js_query_bill)
         logging.warning("=========third==========")
         CSM1001=driver.find_element_by_id("CSM1001").get_attribute("onclick")
         CSM1001_content=CSM1001.split('&')
@@ -93,10 +95,70 @@ class CbssSpider(scrapy.Spider):
             'Host':'sd.cbss.10010.com'
             # 'cookie': dict(cookie_out)
         }
-        res=s.get(reqeust_url,headers=headers,cookies=cookie_out,verify= False)
+        response_str=s.get(reqeust_url,headers=headers,cookies=cookie_out,verify= False)
         time.sleep(5)
-        logging.warning(res.content.decode('gbk'))
-        # res.content
+        logging.warning(response_str.content.decode('gbk'))
+        html=etree.HTML(response_str.content.decode('gbk'))
+        time.sleep(15)
+        BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
+        service=html.xpath('//input[@name="service"]/@value')[0]
+        Form0=html.xpath('//input[@name="Form0"]/@value')[0]
+        logging.warning(html)
+        logging.warning(BSS_ACCTMANM_JSESSIONID)
+        logging.warning(service)
+        logging.warning(Form0)
+        yy=datetime.datetime.now().year
+        mm=datetime.datetime.now().month
+        if (mm<10 and mm>1):
+            mm="0"+str(mm-1)
+        if (mm==1):
+            yy=yy-1
+            mm=12
+        query_month=str(yy)+str(mm)
+        #bulid post method
+        post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
+        data={
+            "back_ACCT_ID":"",
+            "back_USER_ID":"",
+            "bquerytop":"+%B2%E9+%D1%AF+",
+            "cond_ACCT_ID":"",
+            "cond_BILLSEARCH_FLAG":"0",
+            "cond_CBSSREQUEST_SOURCE":"",
+            "cond_CONFIG_BILLCOUNT":"800",
+            "cond_CYCLE_ID":query_month,
+            "cond_CYCLE_SEGMENT":"6",
+            "cond_END_CYCLE_ID":query_month,
+            "cond_ID_TYPE":"1",
+            "cond_NET_TYPE_CODE":"50",
+            "cond_NODISTURB":"",
+            "cond_PARENT_TYPE_CODE":"0",
+            "cond_PRE_TAG":"0",
+            "cond_REMOVE_TAG":"0",
+            "cond_ROUTE_EPARCHY_CODE":"0531",
+            "cond_SEND_SN":"13001711000",
+            "cond_SENDBILLSMS_RIGHT":"0",
+            "cond_SERIAL_NUMBER":"13001711000",
+            "cond_SMS":"",
+            "cond_USER_ID":"",
+            "cond_USER_SERVICE_CODE":"0",
+            "cond_WRITEOFF_MODE":"1",
+            "cond_X_USER_COUNT":"",
+            "Form0":Form0,
+            "MULTI_ACCT_DATA":"",
+            "NOTE_ITEM_DISPLAY":"",
+            "service":service,
+            "smsFlag":"false",
+            "sp":"S0",
+            "userinfoback_USER_ID":"",
+            "X_CODING_STR":""
+        }
+        post_headers = {
+            'referer': 'https://sd.cbss.10010.com/essframe?service=page/component.Navigation&listener=init&needNotify=true&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531',
+            'Host':'sd.cbss.10010.com'
+            # 'cookie': dict(cookie_out)
+        }
+        data=requests.post(post_url,data=data,verify= False).content.decode("gbk")
+        logging.warning(data)
     def parse(self, response):
         logging.debug("=====start parse========")
         pass
