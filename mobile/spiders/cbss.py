@@ -63,13 +63,14 @@ class CbssSpider(scrapy.Spider):
         time.sleep(30)
         # logging.warning("=========first==========")
         logging.warning(driver.page_source)
-        # js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
-        # driver.execute_script(js_query_acct)
-        # time.sleep(3)
+        js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
+        driver.execute_script(js_query_acct)
+        time.sleep(3)
         # logging.warning("=========second==========")
         # logging.warning(driver.page_source)
-        js_query_bill = "var query_acct=document.getElementById('BIL651P').onclick()"
-        driver.execute_script(js_query_bill)
+        # js_query_bill = "var query_acct=document.getElementById('BIL651P').onclick()"
+        # js_query_bill = "var query_acct=document.getElementById('BIL6531').onclick()"
+        # driver.execute_script(js_query_bill)
         logging.warning("=========third==========")
         CSM1001=driver.find_element_by_id("CSM1001").get_attribute("onclick")
         CSM1001_content=CSM1001.split('&')
@@ -77,8 +78,6 @@ class CbssSpider(scrapy.Spider):
         LOGIN_CHECK_CODE=CSM1001_content[4]
         reqeust_url = "https://sd.cbss.10010.com/acctmanm?service=page/amarchquery.queryuserbill.QueryUserBillCBss&listener=myInitialize&RIGHT_CODE=ASMUSERTABQRY&"+LOGIN_RANDOM_CODE+"&"+LOGIN_CHECK_CODE+"&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531"
         logging.warning(reqeust_url)
-        # CSM1001_js="var CSM1001_js=document.getElementById('CSM1001')"
-        # CSM100123=driver.execute_script(CSM1001_js)
         requests.adapters.DEFAULT_RETRIES = 5
         s = requests.session()
         # s.keep_alive = False  # 关闭多余连接
@@ -97,9 +96,9 @@ class CbssSpider(scrapy.Spider):
         }
         response_str=s.get(reqeust_url,headers=headers,cookies=cookie_out,verify= False)
         time.sleep(5)
-        logging.warning(response_str.content.decode('gbk'))
         html=etree.HTML(response_str.content.decode('gbk'))
-        time.sleep(15)
+        time.sleep(60)
+        logging.warning(response_str.content.decode('gbk'))
         BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
         service=html.xpath('//input[@name="service"]/@value')[0]
         Form0=html.xpath('//input[@name="Form0"]/@value')[0]
@@ -153,11 +152,11 @@ class CbssSpider(scrapy.Spider):
             "X_CODING_STR":""
         }
         post_headers = {
-            'referer': 'https://sd.cbss.10010.com/essframe?service=page/component.Navigation&listener=init&needNotify=true&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531',
+            'referer':reqeust_url,
             'Host':'sd.cbss.10010.com'
             # 'cookie': dict(cookie_out)
         }
-        data=requests.post(post_url,data=data,verify= False).content.decode("gbk")
+        data=requests.post(post_url,data=data,headers=post_headers,cookie=cookie_out,verify= False).content.decode("gbk")
         logging.warning(data)
     def parse(self, response):
         logging.debug("=====start parse========")
