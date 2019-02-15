@@ -12,7 +12,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-from lxml import etree
 import json
 import datetime
 import pickle
@@ -26,8 +25,8 @@ class CbssSpider(scrapy.Spider):
     login_url = "https://cbss.10010.com/essframe"
     # 登陆后的链接
     initmy_url = "https://sd.cbss.10010.com/essframe"
-    driver_path="D:/tools/IEDriverServer.exe"
-    # driver_path = "Z:/tools/IEDriverServer.exe"
+    # driver_path="D:/tools/IEDriverServer.exe"
+    driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
     captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
     captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
@@ -60,22 +59,15 @@ class CbssSpider(scrapy.Spider):
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
         driver.switch_to.frame("navframe")
         time.sleep(30)
-        # logging.warning("=========first==========")
+        # in order to find CSM1001
         js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
         driver.execute_script(js_query_acct)
         time.sleep(3)
-        # logging.warning("=========second==========")
-        # logging.warning(driver.page_source)
-        # js_query_bill = "var query_acct=document.getElementById('BIL651P').onclick()"
-        # js_query_bill = "var query_acct=document.getElementById('BIL6531').onclick()"
-        # driver.execute_script(js_query_bill)
-        # logging.warning("=========third==========")
         CSM1001 = driver.find_element_by_id("CSM1001").get_attribute("onclick")
         CSM1001_content=CSM1001.split('&')
         LOGIN_RANDOM_CODE =CSM1001_content[3]
         LOGIN_CHECK_CODE=CSM1001_content[4]
         reqeust_url = "https://sd.cbss.10010.com/acctmanm?service=page/amarchquery.queryuserbill.QueryUserBillCBss&listener=myInitialize&RIGHT_CODE=ASMUSERTABQRY&"+LOGIN_RANDOM_CODE+"&"+LOGIN_CHECK_CODE+"&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531"
-        # logging.warning(reqeust_url)
         requests.adapters.DEFAULT_RETRIES = 5
         s = requests.session()
         # s.keep_alive = False  # 关闭多余连接
@@ -96,14 +88,9 @@ class CbssSpider(scrapy.Spider):
         time.sleep(5)
         html=etree.HTML(response_str.content.decode('gbk'))
         time.sleep(10)
-        # logging.warning(response_str.content.decode('gbk'))
         BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
         service=html.xpath('//input[@name="service"]/@value')[0]
         Form0=html.xpath('//input[@name="Form0"]/@value')[0]
-        # logging.warning(html)
-        # logging.warning(BSS_ACCTMANM_JSESSIONID)
-        # logging.warning(service)
-        # logging.warning(Form0)
         yy=datetime.datetime.now().year
         mm=datetime.datetime.now().month
         if (mm<10 and mm>1):
@@ -114,6 +101,10 @@ class CbssSpider(scrapy.Spider):
         query_month=str(yy)+str(mm)
         #bulid post method
         post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
+        phoneNo='13011718888'
+        cond_NET_TYPE_CODE=''
+        cond_PARENT_TYPE_CODE=''
+        cond_ROUTE_EPARCHY_CODE='0531'
         data={
             "back_ACCT_ID":"",
             "back_USER_ID":"",
@@ -132,9 +123,9 @@ class CbssSpider(scrapy.Spider):
             "cond_PRE_TAG":"0",
             "cond_REMOVE_TAG":"0",
             "cond_ROUTE_EPARCHY_CODE":"0531",
-            "cond_SEND_SN":"13001711000",
+            "cond_SEND_SN":phoneNo,
             "cond_SENDBILLSMS_RIGHT":"0",
-            "cond_SERIAL_NUMBER":"13001711000",
+            "cond_SERIAL_NUMBER":phoneNo,
             "cond_SMS":"",
             "cond_USER_ID":"",
             "cond_USER_SERVICE_CODE":"0",
@@ -149,22 +140,32 @@ class CbssSpider(scrapy.Spider):
             "userinfoback_USER_ID":"",
             "X_CODING_STR":""
         }
+        BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
+        BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
+        BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
+        BSS_ACCTMANM_JSESSIONID_dict={BSS_ACCTMANM_JSESSIONID_key:BSS_ACCTMANM_JSESSIONID_value}
+        cookie_out.update(BSS_ACCTMANM_JSESSIONID_dict)
         post_headers = {
             'referer':reqeust_url,
             'Host':'sd.cbss.10010.com',
             # 'cookie': cookie_out
         }
-        BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
-        BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
-        BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
-        BSS_ACCTMANM_JSESSIONID_dict={BSS_ACCTMANM_JSESSIONID_key:BSS_ACCTMANM_JSESSIONID_value}
-        # logging.warn(BSS_ACCTMANM_JSESSIONID_dict)
-        # logging.warn("before",cookie_out)
-        cookie_out.update(BSS_ACCTMANM_JSESSIONID_dict)
-        # logging.warn("after",cookie_out)
-        # logging.warn(type(cookie_out))
-        data=requests.post(post_url,data=data,headers=post_headers,cookies=cookie_out,verify= False).content.decode("gbk")
-        logging.warning(data)
+        yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_out, callback=self.parse)
+        # data=requests.post(post_url,data=data,headers=post_headers,cookies=cookie_out,verify= False).content.decode("gbk")
+        # logging.warning(data)
     def parse(self, response):
-        logging.debug("=====start parse========")
+        logging.warning(response.body.decode("gbk"))
+        post_res_html = etree.HTML(response.body.decode("gbk"))
+        error_msg =""
+        try:
+            error_msg=post_res_html.xpath("//div[@class='tip']/ul/li/text()")[0].split("：")[0]
+        except:
+            logging.warning("No such error_msg")
+        finally:
+            logging.warning ("It is not error page!")
+        if (error_msg!="" and "错误提示"==error_msg):
+            logging.warning("the phoneNo is invalid")
+        else:
+            logging.warning("phoneNo is valid")
+        logging.warning(error_msg)
         pass
