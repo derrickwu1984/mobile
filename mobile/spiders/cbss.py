@@ -49,6 +49,7 @@ class CbssSpider(scrapy.Spider):
         WebDriverWait(driver, 1000).until(EC.url_to_be(self.initmy_url))
         logging.debug("恭喜您，您已登录成功了！")
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
+        WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.ID, 'navframe')))
         driver.switch_to.frame("navframe")
         # time.sleep(30)
         WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.ID,'SECOND_MENU_LINK_BIL6500')))
@@ -98,12 +99,12 @@ class CbssSpider(scrapy.Spider):
         # #bulid post method
         post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
         headNo='1301171'
-        for subNo in range(8887,8889):
+        for subNo in range(8800,8889):
             phoneNo=headNo+str(subNo).zfill(4)
             cond_NET_TYPE_CODE=''
             cond_PARENT_TYPE_CODE=''
             cond_ROUTE_EPARCHY_CODE='0531'
-            data=self.prepare_data(query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
+            data=self.prepare_data(query_month,"13011718888",cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
             BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
             BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
             BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
@@ -116,7 +117,7 @@ class CbssSpider(scrapy.Spider):
                 'Host':'sd.cbss.10010.com',
             }
             time.sleep(3)
-            yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse,meta={'phoneNo':phoneNo})
+            yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse,meta={'phoneNo':"13011718888"})
     def prepare_data(self,query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service):
         data={
             "back_ACCT_ID":"",
@@ -155,17 +156,25 @@ class CbssSpider(scrapy.Spider):
         }
         return data
     def parse(self, response):
+
         post_res_html = etree.HTML(response.body.decode("gbk"))
+        logging.warn(response.body.decode("gbk"))
         phoneNo=response.meta['phoneNo']
         error_msg =""
         try:
             error_msg=post_res_html.xpath("//div[@class='tip']/ul/li/text()")[0].split("：")[0]
         except:
-            logging.warning("未发现错误提示")
+            # logging.warning("未发现错误提示")
+            pass
         # finally:
         #     logging.warning ("It is not error page!")
         if (error_msg!="" and "错误提示"==error_msg):
             logging.warning(phoneNo+"手机号被注销！")
         else:
             logging.warning(phoneNo+"手机号码有效！")
+            logging.warn(post_res_html)
+            total=post_res_html.xpath("//tr[@class='row_even']/text()")[-4].strip().split("\n")
+            subtotal = post_res_html.xpath("//tr[@class='row_odd']/text()")[-4].strip().split("\n")
+            logging.warn(post_res_html.xpath("//tr[@class='row_even']/text()"))
+            logging.warn(subtotal)
         return
