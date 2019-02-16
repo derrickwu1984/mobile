@@ -50,11 +50,14 @@ class CbssSpider(scrapy.Spider):
         logging.debug("恭喜您，您已登录成功了！")
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
         driver.switch_to.frame("navframe")
-        time.sleep(30)
+        # time.sleep(30)
+        WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.ID,'SECOND_MENU_LINK_BIL6500')))
+        logging.debug("找到 SECOND_MENU_LINK_BIL6500")
         # in order to find CSM1001
         js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
         driver.execute_script(js_query_acct)
         time.sleep(3)
+        WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.ID, 'CSM1001')))
         CSM1001 = driver.find_element_by_id("CSM1001").get_attribute("onclick")
         CSM1001_content=CSM1001.split('&')
         LOGIN_RANDOM_CODE =CSM1001_content[3]
@@ -74,11 +77,9 @@ class CbssSpider(scrapy.Spider):
         headers = {
             'referer': 'https://sd.cbss.10010.com/essframe?service=page/component.Navigation&listener=init&needNotify=true&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531',
             'Host':'sd.cbss.10010.com'
-            # 'cookie': dict(cookie_out)
         }
         yield scrapy.Request(reqeust_url,headers=headers,cookies=cookie_out,callback=self.parse_billPage,meta={'reqeust_url':reqeust_url})
         # data=requests.post(post_url,data=data,headers=post_headers,cookies=cookie_out,verify= False).content.decode("gbk")
-        # logging.warning(data)
     def parse_billPage(self,response):
         reqeust_url=response.meta['reqeust_url']
         html=etree.HTML(response.body.decode("gbk"))
@@ -96,23 +97,26 @@ class CbssSpider(scrapy.Spider):
         query_month=str(yy)+str(mm)
         # #bulid post method
         post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
-        phoneNo='13011718888'
-        cond_NET_TYPE_CODE=''
-        cond_PARENT_TYPE_CODE=''
-        cond_ROUTE_EPARCHY_CODE='0531'
-        data=self.prepare_data(query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
-        BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
-        BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
-        BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
-        BSS_ACCTMANM_JSESSIONID_dict={BSS_ACCTMANM_JSESSIONID_key:BSS_ACCTMANM_JSESSIONID_value}
-        with open('cookies.txt', 'r') as f:
-            cookie_billPage = json.load(f)
-        cookie_billPage.update(BSS_ACCTMANM_JSESSIONID_dict)
-        post_headers = {
-            'referer':reqeust_url,
-            'Host':'sd.cbss.10010.com',
-        }
-        yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse)
+        headNo='1301171'
+        for subNo in range(8887,8889):
+            phoneNo=headNo+str(subNo).zfill(4)
+            cond_NET_TYPE_CODE=''
+            cond_PARENT_TYPE_CODE=''
+            cond_ROUTE_EPARCHY_CODE='0531'
+            data=self.prepare_data(query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
+            BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
+            BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
+            BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
+            BSS_ACCTMANM_JSESSIONID_dict={BSS_ACCTMANM_JSESSIONID_key:BSS_ACCTMANM_JSESSIONID_value}
+            with open('cookies.txt', 'r') as f:
+                cookie_billPage = json.load(f)
+            cookie_billPage.update(BSS_ACCTMANM_JSESSIONID_dict)
+            post_headers = {
+                'referer':reqeust_url,
+                'Host':'sd.cbss.10010.com',
+            }
+            time.sleep(3)
+            yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse,meta={'phoneNo':phoneNo})
     def prepare_data(self,query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service):
         data={
             "back_ACCT_ID":"",
@@ -152,16 +156,16 @@ class CbssSpider(scrapy.Spider):
         return data
     def parse(self, response):
         post_res_html = etree.HTML(response.body.decode("gbk"))
+        phoneNo=response.meta['phoneNo']
         error_msg =""
         try:
             error_msg=post_res_html.xpath("//div[@class='tip']/ul/li/text()")[0].split("：")[0]
         except:
-            logging.warning("No such error_msg")
-        finally:
-            logging.warning ("It is not error page!")
+            logging.warning("未发现错误提示")
+        # finally:
+        #     logging.warning ("It is not error page!")
         if (error_msg!="" and "错误提示"==error_msg):
-            logging.warning("the phoneNo is invalid")
+            logging.warning(phoneNo+"手机号被注销！")
         else:
-            logging.warning("phoneNo is valid")
-        logging.warning(error_msg)
-        pass
+            logging.warning(phoneNo+"手机号码有效！")
+        return
