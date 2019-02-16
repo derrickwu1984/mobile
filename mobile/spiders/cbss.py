@@ -25,8 +25,8 @@ class CbssSpider(scrapy.Spider):
     login_url = "https://cbss.10010.com/essframe"
     # 登陆后的链接
     initmy_url = "https://sd.cbss.10010.com/essframe"
-    # driver_path="D:/tools/IEDriverServer.exe"
-    driver_path = "Z:/tools/IEDriverServer.exe"
+    driver_path="D:/tools/IEDriverServer.exe"
+    # driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
     captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
     captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
@@ -76,81 +76,81 @@ class CbssSpider(scrapy.Spider):
             'Host':'sd.cbss.10010.com'
             # 'cookie': dict(cookie_out)
         }
-        yield scrapy.Request(reqeust_url,headers=headers,cookies=cookie_out,callback=self.parse_billPage)
+        yield scrapy.Request(reqeust_url,headers=headers,cookies=cookie_out,callback=self.parse_billPage,meta={'reqeust_url':reqeust_url})
         # data=requests.post(post_url,data=data,headers=post_headers,cookies=cookie_out,verify= False).content.decode("gbk")
         # logging.warning(data)
     def parse_billPage(self,response):
-        logging.warning(response.body.decode("gbk"))
+        reqeust_url=response.meta['reqeust_url']
         html=etree.HTML(response.body.decode("gbk"))
         time.sleep(10)
         BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
         service=html.xpath('//input[@name="service"]/@value')[0]
         Form0=html.xpath('//input[@name="Form0"]/@value')[0]
-        logging.warning(BSS_ACCTMANM_JSESSIONID)
-        logging.warning(service)
-        # yy=datetime.datetime.now().year
-        # mm=datetime.datetime.now().month
-        # if (mm<10 and mm>1):
-        #     mm="0"+str(mm-1)
-        # if (mm==1):
-        #     yy=yy-1
-        #     mm=12
-        # query_month=str(yy)+str(mm)
+        yy=datetime.datetime.now().year
+        mm=datetime.datetime.now().month
+        if (mm<10 and mm>1):
+            mm="0"+str(mm-1)
+        if (mm==1):
+            yy=yy-1
+            mm=12
+        query_month=str(yy)+str(mm)
         # #bulid post method
-        # post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
-        # phoneNo='13011718888'
-        # cond_NET_TYPE_CODE=''
-        # cond_PARENT_TYPE_CODE=''
-        # cond_ROUTE_EPARCHY_CODE='0531'
-        # data={
-        #     "back_ACCT_ID":"",
-        #     "back_USER_ID":"",
-        #     "bquerytop":"+%B2%E9+%D1%AF+",
-        #     "cond_ACCT_ID":"",
-        #     "cond_BILLSEARCH_FLAG":"0",
-        #     "cond_CBSSREQUEST_SOURCE":"",
-        #     "cond_CONFIG_BILLCOUNT":"800",
-        #     "cond_CYCLE_ID":query_month,
-        #     "cond_CYCLE_SEGMENT":"6",
-        #     "cond_END_CYCLE_ID":query_month,
-        #     "cond_ID_TYPE":"1",
-        #     "cond_NET_TYPE_CODE":"50",
-        #     "cond_NODISTURB":"",
-        #     "cond_PARENT_TYPE_CODE":"0",
-        #     "cond_PRE_TAG":"0",
-        #     "cond_REMOVE_TAG":"0",
-        #     "cond_ROUTE_EPARCHY_CODE":"0531",
-        #     "cond_SEND_SN":phoneNo,
-        #     "cond_SENDBILLSMS_RIGHT":"0",
-        #     "cond_SERIAL_NUMBER":phoneNo,
-        #     "cond_SMS":"",
-        #     "cond_USER_ID":"",
-        #     "cond_USER_SERVICE_CODE":"0",
-        #     "cond_WRITEOFF_MODE":"1",
-        #     "cond_X_USER_COUNT":"",
-        #     "Form0":Form0,
-        #     "MULTI_ACCT_DATA":"",
-        #     "NOTE_ITEM_DISPLAY":"",
-        #     "service":service,
-        #     "smsFlag":"false",
-        #     "sp":"S0",
-        #     "userinfoback_USER_ID":"",
-        #     "X_CODING_STR":""
-        # }
-        # BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
-        # BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
-        # BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
-        # BSS_ACCTMANM_JSESSIONID_dict={BSS_ACCTMANM_JSESSIONID_key:BSS_ACCTMANM_JSESSIONID_value}
-        # cookie_out.update(BSS_ACCTMANM_JSESSIONID_dict)
-        # post_headers = {
-        #     'referer':reqeust_url,
-        #     'Host':'sd.cbss.10010.com',
-        # 'cookie': cookie_out
-        # }
-        # yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_out, callback=self.parse)
-        pass
+        post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
+        phoneNo='13011718888'
+        cond_NET_TYPE_CODE=''
+        cond_PARENT_TYPE_CODE=''
+        cond_ROUTE_EPARCHY_CODE='0531'
+        data=self.prepare_data(query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
+        BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
+        BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
+        BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
+        BSS_ACCTMANM_JSESSIONID_dict={BSS_ACCTMANM_JSESSIONID_key:BSS_ACCTMANM_JSESSIONID_value}
+        with open('cookies.txt', 'r') as f:
+            cookie_billPage = json.load(f)
+        cookie_billPage.update(BSS_ACCTMANM_JSESSIONID_dict)
+        post_headers = {
+            'referer':reqeust_url,
+            'Host':'sd.cbss.10010.com',
+        }
+        yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse)
+    def prepare_data(self,query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service):
+        data={
+            "back_ACCT_ID":"",
+            "back_USER_ID":"",
+            "bquerytop":"+%B2%E9+%D1%AF+",
+            "cond_ACCT_ID":"",
+            "cond_BILLSEARCH_FLAG":"0",
+            "cond_CBSSREQUEST_SOURCE":"",
+            "cond_CONFIG_BILLCOUNT":"800",
+            "cond_CYCLE_ID":query_month,
+            "cond_CYCLE_SEGMENT":"6",
+            "cond_END_CYCLE_ID":query_month,
+            "cond_ID_TYPE":"1",
+            "cond_NET_TYPE_CODE":"50",
+            "cond_NODISTURB":"",
+            "cond_PARENT_TYPE_CODE":"0",
+            "cond_PRE_TAG":"0",
+            "cond_REMOVE_TAG":"0",
+            "cond_ROUTE_EPARCHY_CODE":"0531",
+            "cond_SEND_SN":phoneNo,
+            "cond_SENDBILLSMS_RIGHT":"0",
+            "cond_SERIAL_NUMBER":phoneNo,
+            "cond_SMS":"",
+            "cond_USER_ID":"",
+            "cond_USER_SERVICE_CODE":"0",
+            "cond_WRITEOFF_MODE":"1",
+            "cond_X_USER_COUNT":"",
+            "Form0":Form0,
+            "MULTI_ACCT_DATA":"",
+            "NOTE_ITEM_DISPLAY":"",
+            "service":service,
+            "smsFlag":"false",
+            "sp":"S0",
+            "userinfoback_USER_ID":"",
+            "X_CODING_STR":""
+        }
+        return data
     def parse(self, response):
-        logging.warning(response.body.decode("gbk"))
         post_res_html = etree.HTML(response.body.decode("gbk"))
         error_msg =""
         try:
