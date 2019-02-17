@@ -156,10 +156,6 @@ class CbssSpider(scrapy.Spider):
         }
         return data
     def parse(self, response):
-        temp='''
-       <!-- span jwcid=\"@wade:NavBar\" source=\"ognl:billInfos\"
-						listener=\"ognl:listeners.qryMastBills\"
-		 '''
         response_str=response.body.decode("gbk")
         html = etree.HTML(response_str)
         logging.warn(response_str)
@@ -175,9 +171,34 @@ class CbssSpider(scrapy.Spider):
         if (error_msg!="" and "错误提示"==error_msg):
             logging.warning(phoneNo+"手机号未查询到或已被注销！")
         else:
+            time.sleep(3)
             logging.warning(phoneNo+"手机号码有效！")
-            total_fee = html.xpath("//table[@id='UserBillTable']//tr/td[10]//text()")[-1].strip()
-            actual_fee = html.xpath("//table[@id='UserBillTable']//tr/td[14]//text()")[-1].strip()
-            logging.warn(total_fee)
-            logging.warn(actual_fee)
+            acctflag=html.xpath("//table/tr/td[2]//text()")[0].strip()
+            paytype=html.xpath("//table/tr/td[2]//text()")[1].strip()
+            debtfee=html.xpath("//table/tr/td[2]//text()")[2].strip()
+            fixtype=html.xpath("//table/tr/td[2]//text()")[3].strip()
+            payname=html.xpath("//table/tr/td[4]//text()")[0].strip()
+            prodname=html.xpath("//table/tr/td[4]//text()")[1].strip()
+            fee=html.xpath("//table/tr/td[4]//text()")[2].strip()
+            openflag=html.xpath("//table/tr/td[6]//text()")[0].strip()
+            custbrand=html.xpath("//table/tr/td[6]//text()")[1].strip()
+            actualbal=html.xpath("//table/tr/td[6]//text()")[2].strip()
+            custlocation=html.xpath("//table/tr/td[8]//text()")[0].strip()
+            creditbal= html.xpath("//table/tr/td[8]//text()")[1].strip()
+            totalfee = html.xpath("//table[@id='UserBillTable']//tr/td[10]//text()")[-1].strip()
+            actualfee = html.xpath("//table[@id='UserBillTable']//tr/td[14]//text()")[-1].strip()
+            logging.warning(acctflag)
+            logging.warn(paytype)
+            logging.warn(debtfee)
+            logging.warn(fixtype)
+            logging.warn(payname)
+            logging.warn(prodname)
+            logging.warn(fee)
+            logging.warn(openflag)
+            logging.warn(custbrand)
+            logging.warn(actualbal)
+            logging.warn(totalfee)
+            logging.warn(creditbal)
+            logging.warn(custlocation)
+            logging.warn(actualfee)
         return
