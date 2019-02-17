@@ -161,12 +161,12 @@ class CbssSpider(scrapy.Spider):
 						listener=\"ognl:listeners.qryMastBills\"
 		 '''
         response_str=response.body.decode("gbk")
-        post_res_html = etree.HTML(response_str)
+        html = etree.HTML(response_str)
         logging.warn(response_str)
         phoneNo=response.meta['phoneNo']
         error_msg =""
         try:
-            error_msg=post_res_html.xpath("//div[@class='tip']/ul/li/text()")[0].split("：")[0]
+            error_msg=html.xpath("//div[@class='tip']/ul/li/text()")[0].split("：")[0]
         except:
             # logging.warning("未发现错误提示")
             pass
@@ -176,12 +176,8 @@ class CbssSpider(scrapy.Spider):
             logging.warning(phoneNo+"手机号未查询到或已被注销！")
         else:
             logging.warning(phoneNo+"手机号码有效！")
-            # total=post_res_html.xpath("//tr[@class='row_even']//text()")[-6].strip().split("\n")
-            # subtotal = post_res_html.xpath("//tr[@class='row_odd']//text()")[-6].strip().split("\n")
-            row_even=post_res_html.xpath("//table[@id='UserBillTable']//tr[@class='row_even']//text()")
-            for i in range(len(row_even)):
-                logging.debug(i)
-                logging.debug(row_even[i])
-            # logging.warn(post_res_html.xpath("//tr[@class='row_odd']//text()"))
-            # logging.warn(post_res_html.xpath("//table[@id='UserBillTable']//tr[@class='row_even']//text()")[-6].strip().split("\n"))
+            total_fee = html.xpath("//table[@id='UserBillTable']//tr/td[10]//text()")[-1].strip()
+            actual_fee = html.xpath("//table[@id='UserBillTable']//tr/td[14]//text()")[-1].strip()
+            logging.warn(total_fee)
+            logging.warn(actual_fee)
         return
