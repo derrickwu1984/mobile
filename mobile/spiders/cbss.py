@@ -195,7 +195,9 @@ class CbssSpider(scrapy.Spider):
             creditbal= html.xpath("//table/tr/td[8]//text()")[1].strip()
             totalfee = html.xpath("//table[@id='UserBillTable']//tr/td[10]//text()")[-1].strip()
             actualfee = html.xpath("//table[@id='UserBillTable']//tr/td[14]//text()")[-1].strip()
-            mobileItemLoader = ItemLoader(item=MobileItem())
+
+
+            mobileItemLoader = ItemLoader(item=MobileItem(),response=response)
             mobileItemLoader.add_value("acctflag",acctflag)
             mobileItemLoader.add_value("paytype",paytype)
             mobileItemLoader.add_value("debtfee",debtfee)

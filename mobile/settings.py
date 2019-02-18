@@ -64,10 +64,16 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'mobile.pipelines.MobilePipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'mobile.pipelines.MobilePipeline': 300,
+}
 
+# CRITICAL - 严重错误
+# ERROR - 一般错误
+# WARNING - 警告信息
+# INFO - 一般信息
+# DEBUG - 调试信息
+# LOG_LEVEL = 'WARNING'
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
