@@ -44,7 +44,10 @@ class CbssSpider(scrapy.Spider):
     userName=""
     passWd=""
     js_exec="var but_click=document.getElementsByClassName('submit')[0].children[0].onclick"
-
+    cur_month=datetime.datetime.now().month
+    if (cur_month<10):
+        cur_month="0"+str(cur_month)
+    crawldate=str(datetime.datetime.now().year)+cur_month+str(datetime.datetime.now().day)
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
     def login(self, response):
@@ -96,7 +99,6 @@ class CbssSpider(scrapy.Spider):
         reqeust_url=response.meta['reqeust_url']
         html=etree.HTML(response.body.decode("gbk"))
         time.sleep(10)
-        logging.warning(response.body.decode("gbk"))
         BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
         service=html.xpath('//input[@name="service"]/@value')[0]
         Form0=html.xpath('//input[@name="Form0"]/@value')[0]
@@ -111,12 +113,12 @@ class CbssSpider(scrapy.Spider):
         # #bulid post method
         post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
         headNo='1301171'
-        for subNo in range(8800,8889):
+        for subNo in range(8800,8899):
             phoneNo=headNo+str(subNo).zfill(4)
             cond_NET_TYPE_CODE=''
             cond_PARENT_TYPE_CODE=''
             cond_ROUTE_EPARCHY_CODE='0531'
-            data=self.prepare_data(query_month,"13011718888",cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
+            data=self.prepare_data(query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
             BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
             BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
             BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
@@ -129,7 +131,7 @@ class CbssSpider(scrapy.Spider):
                 'Host':'sd.cbss.10010.com',
             }
             time.sleep(3)
-            yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse,meta={'phoneNo':"13011718888"})
+            yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse,meta={'phoneNo':phoneNo,"headNo":headNo,"query_month":query_month})
     def prepare_data(self,query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service):
         data={
             "back_ACCT_ID":"",
@@ -171,6 +173,8 @@ class CbssSpider(scrapy.Spider):
         response_str=response.body.decode("gbk")
         html = etree.HTML(response_str)
         phoneNo=response.meta['phoneNo']
+        headNo =response.meta['headNo']
+        query_month=response.meta['query_month']
         error_msg =""
         try:
             error_msg=html.xpath("//div[@class='tip']/ul/li/text()")[0].split("：")[0]
@@ -199,6 +203,10 @@ class CbssSpider(scrapy.Spider):
 
 
             mobileItemLoader = ItemLoader(item=MobileItem(),response=response)
+            mobileItemLoader.add_value("crawldate", self.crawldate)
+            mobileItemLoader.add_value("rangeno", headNo)
+            mobileItemLoader.add_value("phoneno", phoneNo)
+            mobileItemLoader.add_value("querymonth", query_month)
             mobileItemLoader.add_value("acctflag",acctflag)
             mobileItemLoader.add_value("paytype",paytype)
             mobileItemLoader.add_value("debtfee",debtfee)
