@@ -15,9 +15,18 @@ import time
 import json
 import datetime
 import pickle
+import sys
 from PIL import Image
 from io import BytesIO
 from scrapy.http.cookies import CookieJar
+
+# set default logging configuration
+logger = logging.getLogger()  # initialize logging class
+logger.setLevel(logging.WARNING)  # default log level
+format = logging.Formatter("%(asctime)s - %(message)s")  # output format
+sh = logging.StreamHandler(stream=sys.stdout)  # output to standard output
+sh.setFormatter(format)
+logger.addHandler(sh)
 class CbssSpider(scrapy.Spider):
     name = 'cbss'
     allowed_domains = ['cbss.10010.com']
@@ -25,8 +34,8 @@ class CbssSpider(scrapy.Spider):
     login_url = "https://cbss.10010.com/essframe"
     # 登陆后的链接
     initmy_url = "https://sd.cbss.10010.com/essframe"
-    driver_path="D:/tools/IEDriverServer.exe"
-    # driver_path = "Z:/tools/IEDriverServer.exe"
+    # driver_path="D:/tools/IEDriverServer.exe"
+    driver_path = "Z:/tools/IEDriverServer.exe"
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
     captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
     captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
@@ -158,7 +167,6 @@ class CbssSpider(scrapy.Spider):
     def parse(self, response):
         response_str=response.body.decode("gbk")
         html = etree.HTML(response_str)
-        logging.warn(response_str)
         phoneNo=response.meta['phoneNo']
         error_msg =""
         try:
@@ -171,34 +179,34 @@ class CbssSpider(scrapy.Spider):
         if (error_msg!="" and "错误提示"==error_msg):
             logging.warning(phoneNo+"手机号未查询到或已被注销！")
         else:
-            time.sleep(3)
             logging.warning(phoneNo+"手机号码有效！")
-            acctflag=html.xpath("//table/tr/td[2]//text()")[0].strip()
-            paytype=html.xpath("//table/tr/td[2]//text()")[1].strip()
-            debtfee=html.xpath("//table/tr/td[2]//text()")[2].strip()
-            fixtype=html.xpath("//table/tr/td[2]//text()")[3].strip()
-            payname=html.xpath("//table/tr/td[4]//text()")[0].strip()
-            prodname=html.xpath("//table/tr/td[4]//text()")[1].strip()
-            fee=html.xpath("//table/tr/td[4]//text()")[2].strip()
-            openflag=html.xpath("//table/tr/td[6]//text()")[0].strip()
-            custbrand=html.xpath("//table/tr/td[6]//text()")[1].strip()
-            actualbal=html.xpath("//table/tr/td[6]//text()")[2].strip()
+            acctflag=html.xpath("//table/tr/td[2]//text()")[12].strip()
+            paytype=html.xpath("//table/tr/td[2]//text()")[13].strip()
+            debtfee=html.xpath("//table/tr/td[2]//text()")[14].strip()
+            fixtype=html.xpath("//table/tr/td[2]//text()")[15].strip()
+            payname=html.xpath("//table/tr/td[4]//text()")[-3].strip()
+            prodname=html.xpath("//table/tr/td[4]//text()")[-2].strip()
+            fee=html.xpath("//table/tr/td[4]//text()")[-1].strip()
+            openflag=html.xpath("//table/tr/td[6]//text()")[-3].strip()
+            custbrand=html.xpath("//table/tr/td[6]//text()")[-2].strip()
+            actualbal=html.xpath("//table/tr/td[6]//text()")[-1].strip()
             custlocation=html.xpath("//table/tr/td[8]//text()")[0].strip()
             creditbal= html.xpath("//table/tr/td[8]//text()")[1].strip()
             totalfee = html.xpath("//table[@id='UserBillTable']//tr/td[10]//text()")[-1].strip()
             actualfee = html.xpath("//table[@id='UserBillTable']//tr/td[14]//text()")[-1].strip()
+            logging.warning(html.xpath("//table/tr/td[8]//text()"))
             logging.warning(acctflag)
-            logging.warn(paytype)
-            logging.warn(debtfee)
-            logging.warn(fixtype)
-            logging.warn(payname)
-            logging.warn(prodname)
-            logging.warn(fee)
-            logging.warn(openflag)
-            logging.warn(custbrand)
-            logging.warn(actualbal)
-            logging.warn(totalfee)
-            logging.warn(creditbal)
-            logging.warn(custlocation)
-            logging.warn(actualfee)
+            logging.warning(paytype)
+            logging.warning(debtfee)
+            logging.warning(fixtype)
+            logging.warning(fee)
+            logging.warning(prodname)
+            logging.warning(fee)
+            logging.warning(openflag)
+            logging.warning(custbrand)
+            logging.warning(actualbal)
+            logging.warning(totalfee)
+            logging.warning(creditbal)
+            logging.warning(custlocation)
+            logging.warning(actualfee)
         return
