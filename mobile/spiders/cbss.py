@@ -96,6 +96,7 @@ class CbssSpider(scrapy.Spider):
         reqeust_url=response.meta['reqeust_url']
         html=etree.HTML(response.body.decode("gbk"))
         time.sleep(10)
+        logging.warning(response.body.decode("gbk"))
         BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
         service=html.xpath('//input[@name="service"]/@value')[0]
         Form0=html.xpath('//input[@name="Form0"]/@value')[0]
@@ -214,5 +215,5 @@ class CbssSpider(scrapy.Spider):
             mobileItemLoader.add_value("actualfee",actualfee)
             userInfo = mobileItemLoader.load_item()
             yield userInfo
-            logging.warning(userInfo)
+            # logging.warning(userInfo)
         # return

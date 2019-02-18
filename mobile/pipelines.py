@@ -7,8 +7,6 @@
 import MySQLdb
 
 class MobilePipeline(object):
-    def process_item(self, item, spider):
-        return item
     class cbssPipeline(object):
         def __init__(self):
             self.conn = MySQLdb.connect('localhost', 'root', 'root12#$', 'cbss', charset='utf8', use_unicode=True)

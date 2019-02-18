@@ -53,7 +53,7 @@ RANDOM_UA_TYPE="ie"
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'mobile.middlewares.MobileDownloaderMiddleware': 543,
+   'mobile.middlewares.MobileDownloaderMiddleware': 299,
 }
 
 # Enable or disable extensions
@@ -65,7 +65,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'mobile.pipelines.MobilePipeline': 300,
+   'mobile.pipelines.MobilePipeline': 1,
 }
 
 # CRITICAL - 严重错误
