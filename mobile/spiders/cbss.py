@@ -11,6 +11,8 @@ from selenium.webdriver.support import expected_conditions as EC #期望的条�
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from scrapy.loader import  ItemLoader
+from mobile.items import MobileItem
 import time
 import json
 import datetime
@@ -21,12 +23,12 @@ from io import BytesIO
 from scrapy.http.cookies import CookieJar
 
 # set default logging configuration
-logger = logging.getLogger()  # initialize logging class
-logger.setLevel(logging.WARNING)  # default log level
-format = logging.Formatter("%(asctime)s - %(message)s")  # output format
-sh = logging.StreamHandler(stream=sys.stdout)  # output to standard output
-sh.setFormatter(format)
-logger.addHandler(sh)
+# logger = logging.getLogger()  # initialize logging class
+# logger.setLevel(logging.WARNING)  # default log level
+# format = logging.Formatter("%(asctime)s - %(message)s")  # output format
+# sh = logging.StreamHandler(stream=sys.stdout)  # output to standard output
+# sh.setFormatter(format)
+# logger.addHandler(sh)
 class CbssSpider(scrapy.Spider):
     name = 'cbss'
     allowed_domains = ['cbss.10010.com']
@@ -172,7 +174,6 @@ class CbssSpider(scrapy.Spider):
         try:
             error_msg=html.xpath("//div[@class='tip']/ul/li/text()")[0].split("：")[0]
         except:
-            # logging.warning("未发现错误提示")
             pass
         # finally:
         #     logging.warning ("It is not error page!")
@@ -194,19 +195,22 @@ class CbssSpider(scrapy.Spider):
             creditbal= html.xpath("//table/tr/td[8]//text()")[1].strip()
             totalfee = html.xpath("//table[@id='UserBillTable']//tr/td[10]//text()")[-1].strip()
             actualfee = html.xpath("//table[@id='UserBillTable']//tr/td[14]//text()")[-1].strip()
-            logging.warning(html.xpath("//table/tr/td[8]//text()"))
-            logging.warning(acctflag)
-            logging.warning(paytype)
-            logging.warning(debtfee)
-            logging.warning(fixtype)
-            logging.warning(fee)
-            logging.warning(prodname)
-            logging.warning(fee)
-            logging.warning(openflag)
-            logging.warning(custbrand)
-            logging.warning(actualbal)
-            logging.warning(totalfee)
-            logging.warning(creditbal)
-            logging.warning(custlocation)
-            logging.warning(actualfee)
-        return
+            mobileItemLoader = ItemLoader(item=MobileItem())
+            mobileItemLoader.add_value("acctflag",acctflag)
+            mobileItemLoader.add_value("paytype",paytype)
+            mobileItemLoader.add_value("debtfee",debtfee)
+            mobileItemLoader.add_value("fixtype",fixtype)
+            mobileItemLoader.add_value("payname",payname)
+            mobileItemLoader.add_value("prodname",prodname)
+            mobileItemLoader.add_value("fee",fee)
+            mobileItemLoader.add_value("openflag",openflag)
+            mobileItemLoader.add_value("custbrand",custbrand)
+            mobileItemLoader.add_value("actualbal",actualbal)
+            mobileItemLoader.add_value("custlocation",custlocation)
+            mobileItemLoader.add_value("creditbal",creditbal)
+            mobileItemLoader.add_value("totalfee",totalfee)
+            mobileItemLoader.add_value("actualfee",actualfee)
+            userInfo = mobileItemLoader.load_item()
+            yield userInfo
+            logging.warning(userInfo)
+        # return
