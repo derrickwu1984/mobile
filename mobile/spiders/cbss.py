@@ -94,7 +94,6 @@ class CbssSpider(scrapy.Spider):
             'Host':'sd.cbss.10010.com'
         }
         yield scrapy.Request(reqeust_url,headers=headers,cookies=cookie_out,callback=self.parse_billPage,meta={'reqeust_url':reqeust_url})
-        # data=requests.post(post_url,data=data,headers=post_headers,cookies=cookie_out,verify= False).content.decode("gbk")
     def parse_billPage(self,response):
         reqeust_url=response.meta['reqeust_url']
         html=etree.HTML(response.body.decode("gbk"))
@@ -189,7 +188,10 @@ class CbssSpider(scrapy.Spider):
             acctflag=html.xpath("//table/tr/td[2]//text()")[12].strip()
             paytype=html.xpath("//table/tr/td[2]//text()")[13].strip()
             debtfee=html.xpath("//table/tr/td[2]//text()")[14].strip()
-            fixtype=html.xpath("//table/tr/td[2]//text()")[15].strip()
+            try:
+                fixtype=html.xpath("//table/tr/td[2]//text()")[15].strip()
+            except:
+                fixtype=""
             payname=html.xpath("//table/tr/td[4]//text()")[-3].strip()
             prodname=html.xpath("//table/tr/td[4]//text()")[-2].strip()
             fee=html.xpath("//table/tr/td[4]//text()")[-1].strip()
