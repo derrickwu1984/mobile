@@ -14,7 +14,7 @@ class MobilePipeline(object):
 
     def process_item(self, item, spider):
         insert_sql = """
-        insert into cbss_mobile_userinfo_jinan(object_id,crawldate,rangeno,phoneno,querymonth,
+        insert into mobile_custInfo(object_id,crawldate,rangeno,phoneno,querymonth,
                                   acctflag,paytype,debtfee,fixtype,
                                   payname,prodname,fee,openflag,
                                   custbrand,actualbal,custlocation,creditbal,
