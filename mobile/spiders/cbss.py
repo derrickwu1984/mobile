@@ -48,6 +48,12 @@ class CbssSpider(scrapy.Spider):
     if (cur_month<10):
         cur_month="0"+str(cur_month)
     crawldate=str(datetime.datetime.now().year)+cur_month+str(datetime.datetime.now().day)
+
+    def __init__(self,rangeNo,startNo,endNo):
+        self.rangeNo=rangeNo
+        self.startNo=startNo
+        self.endNo=endNo
+        pass
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
     def login(self, response):
@@ -80,7 +86,6 @@ class CbssSpider(scrapy.Spider):
         reqeust_url = "https://sd.cbss.10010.com/acctmanm?service=page/amarchquery.queryuserbill.QueryUserBillCBss&listener=myInitialize&RIGHT_CODE=ASMUSERTABQRY&"+LOGIN_RANDOM_CODE+"&"+LOGIN_CHECK_CODE+"&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531"
         requests.adapters.DEFAULT_RETRIES = 5
         s = requests.session()
-        # s.keep_alive = False  # 关闭多余连接
         cookies_dict = {}
         cookies = driver.get_cookies()
         for cookie in cookies:
@@ -111,8 +116,10 @@ class CbssSpider(scrapy.Spider):
         query_month=str(yy)+str(mm)
         # #bulid post method
         post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
-        headNo='1301171'
-        for subNo in range(8800,8899):
+        # headNo='1301171'
+        headNo = self.rangeNo
+        # for subNo in range(8800,8899):
+        for subNo in range(int(self.startNo), int(self.endNo)):
             phoneNo=headNo+str(subNo).zfill(4)
             cond_NET_TYPE_CODE=''
             cond_PARENT_TYPE_CODE=''
