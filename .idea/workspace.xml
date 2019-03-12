@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2ad5d86d-bee8-4518-abd7-64f17c8d5317" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/mobile/spiders/cbss.py" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/spiders/cbss.py" afterDir="false" />
-    </list>
+    <list default="true" id="2ad5d86d-bee8-4518-abd7-64f17c8d5317" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,7 +19,7 @@
         <entry file="file://$PROJECT_DIR$/mobile/spiders/cbss.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="187">
-              <caret line="44" column="15" lean-forward="true" selection-start-line="44" selection-start-column="15" selection-end-line="44" selection-end-column="15" />
+              <caret line="44" column="14" lean-forward="true" selection-start-line="44" selection-start-column="14" selection-end-line="44" selection-end-column="26" />
               <folding>
                 <element signature="e#24#59#0" expanded="true" />
               </folding>
@@ -701,7 +699,7 @@
     <entry file="file://$PROJECT_DIR$/mobile/spiders/cbss.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
-          <caret line="44" column="15" lean-forward="true" selection-start-line="44" selection-start-column="15" selection-end-line="44" selection-end-column="15" />
+          <caret line="44" column="14" lean-forward="true" selection-start-line="44" selection-start-column="14" selection-end-line="44" selection-end-column="26" />
           <folding>
             <element signature="e#24#59#0" expanded="true" />
           </folding>
