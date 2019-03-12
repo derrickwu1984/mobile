@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ad5d86d-bee8-4518-abd7-64f17c8d5317" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/mobile/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/pipelines.py" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/pipelines.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,11 +38,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pipelines.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="pipelines.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mobile/pipelines.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="211">
-              <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
+              <caret line="9" column="52" selection-start-line="9" selection-start-column="52" selection-end-line="9" selection-end-column="52" />
             </state>
           </provider>
         </entry>
@@ -77,7 +77,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mobile/main.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="135">
@@ -122,9 +122,9 @@
         <option value="$PROJECT_DIR$/mobile/test.py" />
         <option value="$PROJECT_DIR$/mobile/settings.py" />
         <option value="$PROJECT_DIR$/mobile/__init__.py" />
-        <option value="$PROJECT_DIR$/mobile/pipelines.py" />
         <option value="$PROJECT_DIR$/mobile/spiders/cbss.py" />
         <option value="$PROJECT_DIR$/mobile/main.py" />
+        <option value="$PROJECT_DIR$/mobile/pipelines.py" />
       </list>
     </option>
   </component>
@@ -681,13 +681,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/pipelines.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mobile/spiders/cbss.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="241">
@@ -705,6 +698,13 @@
           <folding>
             <element signature="e#0#34#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/pipelines.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="9" column="52" selection-start-line="9" selection-start-column="52" selection-end-line="9" selection-end-column="52" />
         </state>
       </provider>
     </entry>
