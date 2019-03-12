@@ -3,7 +3,7 @@ import  logging,_thread
 
 # def mutil_process(thread_name,rangeNo):
 #     print("%s:%s" % (thread_name, rangeNo))
-execute(["scrapy", "crawl", "cbss", "-a", "rangeNo=1301171", "-a", "startNo=8800", "-a", "endNo=8900"])
+execute(["scrapy", "crawl", "cbss", "-a", "rangeNo=1301171", "-a", "startNo=0000", "-a", "endNo=10000"])
 
 # try:
 #     _thread.start_new_thread(mutil_process,("thread-1","1300017",))

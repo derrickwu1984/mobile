@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ad5d86d-bee8-4518-abd7-64f17c8d5317" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/mobile/pipelines.py" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/pipelines.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/spiders/cbss.py" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/spiders/cbss.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,7 +17,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="cbss.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="cbss.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mobile/spiders/cbss.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="241">
@@ -78,11 +77,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mobile/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
-              <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
+            <state relative-caret-position="135">
+              <caret line="5" column="99" selection-start-line="5" selection-start-column="99" selection-end-line="5" selection-end-column="99" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -122,10 +121,10 @@
         <option value="$PROJECT_DIR$/mobile/items.py" />
         <option value="$PROJECT_DIR$/mobile/test.py" />
         <option value="$PROJECT_DIR$/mobile/settings.py" />
-        <option value="$PROJECT_DIR$/mobile/main.py" />
         <option value="$PROJECT_DIR$/mobile/__init__.py" />
         <option value="$PROJECT_DIR$/mobile/pipelines.py" />
         <option value="$PROJECT_DIR$/mobile/spiders/cbss.py" />
+        <option value="$PROJECT_DIR$/mobile/main.py" />
       </list>
     </option>
   </component>
@@ -655,16 +654,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mobile/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="497">
@@ -705,6 +694,16 @@
           <caret line="40" column="22" selection-start-line="40" selection-start-column="22" selection-end-line="40" selection-end-column="22" />
           <folding>
             <element signature="e#24#59#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="5" column="99" selection-start-line="5" selection-start-column="99" selection-end-line="5" selection-end-column="99" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
           </folding>
         </state>
       </provider>
