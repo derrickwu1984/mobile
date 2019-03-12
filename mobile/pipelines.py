@@ -4,10 +4,10 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-import MySQLdb,uuid
+import uuid,pymysql
 class MobilePipeline(object):
     def __init__(self):
-        self.conn = MySQLdb.connect('192.168.1.105', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
+        self.conn = pymysql.connect('192.168.1.105', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
         # self.conn = MySQLdb.connect('localhost', 'root', 'root12#$', 'cbss', charset='utf8', use_unicode=True)
         self.curor = self.conn.cursor()
         pass
