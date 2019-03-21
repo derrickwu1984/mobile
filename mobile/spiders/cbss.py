@@ -42,8 +42,8 @@ class CbssSpider(scrapy.Spider):
     captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
     captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
     captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
-    userName="sdsc-xingyy7"
-    passWd="BySh@2019"
+    userName=""
+    passWd=""
     js_exec="var but_click=document.getElementsByClassName('submit')[0].children[0].onclick"
     cur_month=datetime.datetime.now().month
     if (cur_month<10):
