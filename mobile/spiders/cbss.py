@@ -13,7 +13,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from scrapy.loader import  ItemLoader
 from mobile.items import MobileItem
-import time
+import time,re
 import json
 import datetime
 import pickle
@@ -35,15 +35,16 @@ class CbssSpider(scrapy.Spider):
     start_urls = ['https://cbss.10010.com/essframe']
     login_url = "https://cbss.10010.com/essframe"
     # 登陆后的链接
-    initmy_url = "https://sd.cbss.10010.com/essframe"
+    initmy_url = "https://bj.cbss.10010.com/essframe"
+    post_url="https://bj.cbss.10010.com/acctmanm;"
     # driver_path="D:/tools/IEDriverServer.exe"
-    # driver_path = "Z:/tools/IEDriverServer.exe"
-    driver_path = "C:/IEDriverServer.exe"
-    captha_image_url="https://hq.cbss.10010.com/image?mode=validate&width=60&height=20"
-    captha_image_path="Z:\\Users\\wumingxing\\Desktop\\printscreen.png"
-    captha_image = "Z:\\Users\\wumingxing\\Desktop\\captha.png"
-    userName=""
-    passWd=""
+    driver_path = "Z:/tools/IEDriverServer.exe"
+    # driver_path = "C:/IEDriverServer.exe"
+    userName="bjsc-wangj1"
+    passWd="BySh@2019"
+    province_code = "bj"
+    depart_id="11b2pk1"
+
     js_exec="var but_click=document.getElementsByClassName('submit')[0].children[0].onclick"
     cur_month=datetime.datetime.now().month
     if (cur_month<10):
@@ -63,28 +64,28 @@ class CbssSpider(scrapy.Spider):
         time.sleep(5)
         driver.find_element_by_id("STAFF_ID").send_keys(self.userName)
         driver.find_element_by_id("LOGIN_PASSWORD").send_keys(self.passWd)
-        Select(driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value("17")
+        Select(driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value("11")
         # captha_input=input(u"请输入验证码:")
         # VERIFY_CODE_ELE = driver.find_element_by_id("VERIFY_CODE")
         # VERIFY_CODE_ELE.send_keys(captha_input)
         WebDriverWait(driver, 1000).until(EC.url_to_be(self.initmy_url))
         logging.debug("恭喜您，您已登录成功了！")
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
-        WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.ID, 'navframe')))
+        WebDriverWait(driver, 600).until(EC.presence_of_element_located((By.ID, 'navframe')))
         driver.switch_to.frame("navframe")
         # time.sleep(30)
-        WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.ID,'SECOND_MENU_LINK_BIL6500')))
-        logging.debug("找到 SECOND_MENU_LINK_BIL6500")
+        WebDriverWait(driver, 600).until(EC.presence_of_element_located((By.ID,'SECOND_MENU_LINK_BIL6500')))
+        logging.warning("找到 SECOND_MENU_LINK_BIL6500")
         # in order to find CSM1001
         js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
         driver.execute_script(js_query_acct)
         time.sleep(3)
-        WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.ID, 'CSM1001')))
-        CSM1001 = driver.find_element_by_id("CSM1001").get_attribute("onclick")
-        CSM1001_content=CSM1001.split('&')
-        LOGIN_RANDOM_CODE =CSM1001_content[3]
-        LOGIN_CHECK_CODE=CSM1001_content[4]
-        reqeust_url = "https://sd.cbss.10010.com/acctmanm?service=page/amarchquery.queryuserbill.QueryUserBillCBss&listener=myInitialize&RIGHT_CODE=ASMUSERTABQRY&"+LOGIN_RANDOM_CODE+"&"+LOGIN_CHECK_CODE+"&LOGIN_PROVINCE_CODE=17&IPASS_LOGIN=null&gray_staff_id=sdsc-xingyy7&gray_depart_id=17b5q7m&gray_province_code=17&gray_eparchy_code=0531&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531"
+        # WebDriverWait(driver, 600).until(EC.presence_of_element_located((By.ID, 'CSM1001')))
+        WebDriverWait(driver, 600).until(EC.presence_of_element_located((By.ID, 'BIL6531')))
+        openmenu = driver.find_element_by_id("BIL6531").get_attribute("onclick")
+        r = re.findall(r"'([\S\s]+?)'", openmenu)
+        request_url="https://"+self.province_code+".cbss.10010.com"+r[0]
+        logging.warning(request_url)
         requests.adapters.DEFAULT_RETRIES = 5
         s = requests.session()
         cookies_dict = {}
@@ -96,12 +97,13 @@ class CbssSpider(scrapy.Spider):
         with open('cookies.txt', 'r') as f:
             cookie_out = json.load(f)
         headers = {
-            'referer': 'https://sd.cbss.10010.com/essframe?service=page/component.Navigation&listener=init&needNotify=true&staffId=sdsc-xingyy7&departId=17b5q7m&subSysCode=CBS&eparchyCode=0531',
-            'Host':'sd.cbss.10010.com'
+            'referer': 'https://bj.cbss.10010.com/essframe?service=page/component.Navigation&listener=init&needNotify=true&staffId='+self.userName+'&departId='+self.depart_id+'&subSysCode=CBS&eparchyCode=0010',
+            'Host':'bj.cbss.10010.com'
         }
-        yield scrapy.Request(reqeust_url,headers=headers,cookies=cookie_out,callback=self.parse_billPage,meta={'reqeust_url':reqeust_url})
+        yield scrapy.Request(request_url,headers=headers,cookies=cookie_out,callback=self.parse_billPage,meta={'reqeust_url':request_url})
     def parse_billPage(self,response):
         reqeust_url=response.meta['reqeust_url']
+        logging.warning(response.body.decode("gbk"))
         html=etree.HTML(response.body.decode("gbk"))
         time.sleep(10)
         BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
@@ -116,7 +118,7 @@ class CbssSpider(scrapy.Spider):
             mm=12
         query_month=str(yy)+str(mm)
         # #bulid post method
-        post_url="https://sd.cbss.10010.com/acctmanm;"+BSS_ACCTMANM_JSESSIONID
+        post_url=self.post_url+BSS_ACCTMANM_JSESSIONID
         # headNo='1301171'
         headNo = self.rangeNo
         # for subNo in range(8800,8899):
@@ -124,8 +126,8 @@ class CbssSpider(scrapy.Spider):
             phoneNo=headNo+str(subNo).zfill(4)
             cond_NET_TYPE_CODE=''
             cond_PARENT_TYPE_CODE=''
-            cond_ROUTE_EPARCHY_CODE='0531'
-            data=self.prepare_data(query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
+            cond_ROUTE_EPARCHY_CODE='0010'
+            data=self.prepare_data(cond_ROUTE_EPARCHY_CODE,query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service)
             BSS_ACCTMANM_JSESSIONID_array=BSS_ACCTMANM_JSESSIONID.split("=")
             BSS_ACCTMANM_JSESSIONID_key=BSS_ACCTMANM_JSESSIONID_array[0]
             BSS_ACCTMANM_JSESSIONID_value = BSS_ACCTMANM_JSESSIONID_array[1]
@@ -135,11 +137,11 @@ class CbssSpider(scrapy.Spider):
             cookie_billPage.update(BSS_ACCTMANM_JSESSIONID_dict)
             post_headers = {
                 'referer':reqeust_url,
-                'Host':'sd.cbss.10010.com',
+                'Host':'bj.cbss.10010.com',
             }
             time.sleep(3)
             yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse,meta={'phoneNo':phoneNo,"headNo":headNo,"query_month":query_month})
-    def prepare_data(self,query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service):
+    def prepare_data(self,eparchy_code,query_month,phoneNo,cond_NET_TYPE_CODE,cond_PARENT_TYPE_CODE,cond_ROUTE_EPARCHY_CODE,Form0,service):
         data={
             "back_ACCT_ID":"",
             "back_USER_ID":"",
@@ -157,7 +159,7 @@ class CbssSpider(scrapy.Spider):
             "cond_PARENT_TYPE_CODE":"0",
             "cond_PRE_TAG":"0",
             "cond_REMOVE_TAG":"0",
-            "cond_ROUTE_EPARCHY_CODE":"0531",
+            "cond_ROUTE_EPARCHY_CODE":eparchy_code,
             "cond_SEND_SN":phoneNo,
             "cond_SENDBILLSMS_RIGHT":"0",
             "cond_SERIAL_NUMBER":phoneNo,
