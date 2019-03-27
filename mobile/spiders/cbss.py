@@ -38,8 +38,8 @@ class CbssSpider(scrapy.Spider):
     initmy_url = "https://bj.cbss.10010.com/essframe"
     post_url="https://bj.cbss.10010.com/acctmanm;"
     # driver_path="D:/tools/IEDriverServer.exe"
-    driver_path = "Z:/tools/IEDriverServer.exe"
-    # driver_path = "C:/IEDriverServer.exe"
+    # driver_path = "Z:/tools/IEDriverServer.exe"
+    driver_path = "C:/IEDriverServer.exe"
     userName="bjsc-wangj1"
     passWd="BySh@2019"
     province_code = "bj"
@@ -84,7 +84,7 @@ class CbssSpider(scrapy.Spider):
         WebDriverWait(driver, 600).until(EC.presence_of_element_located((By.ID, 'BIL6531')))
         openmenu = driver.find_element_by_id("BIL6531").get_attribute("onclick")
         r = re.findall(r"'([\S\s]+?)'", openmenu)
-        request_url="https://"+self.province_code+".cbss.10010.com"+r[0]
+        request_url="https://"+self.province_code+".cbss.10010.com"+r[0]+"&staffId="+self.userName+"&departId="+self.depart_id+"&subSysCode=CBS&eparchyCode=0010"
         logging.warning(request_url)
         requests.adapters.DEFAULT_RETRIES = 5
         s = requests.session()
