@@ -18,12 +18,12 @@ class MobilePipeline(object):
                                   acctflag,paytype,debtfee,fixtype,
                                   payname,prodname,fee,openflag,
                                   custbrand,actualbal,custlocation,creditbal,
-                                  totalfee,actualfee)
+                                  totalfee,actualfee,marketing)
                        values (%s,%s,%s,%s,
                                 %s,%s,%s,%s,
                                 %s,%s,%s,%s,
                                 %s,%s,%s,%s,
-                                %s,%s,%s)
+                                %s,%s,%s,%s)
             """
         if len(item) > 2:
                 self.curor.execute(insert_sql,
@@ -31,7 +31,7 @@ class MobilePipeline(object):
                                     , item["acctflag"], item["paytype"], item["debtfee"], item["fixtype"]
                                     , item["payname"], item["prodname"], item["fee"], item["openflag"]
                                     , item["custbrand"], item["actualbal"], item["custlocation"], item["creditbal"]
-                                    , item["totalfee"], item["actualfee"]))
+                                    , item["totalfee"], item["actualfee"],"O"))
                 self.conn.commit()
 
 
