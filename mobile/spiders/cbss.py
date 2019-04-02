@@ -18,7 +18,6 @@ import json
 import datetime
 import pickle
 import sys
-from PIL import Image
 from io import BytesIO
 from scrapy.http.cookies import CookieJar
 
@@ -37,8 +36,8 @@ class CbssSpider(scrapy.Spider):
     # 登陆后的链接
     initmy_url = "https://bj.cbss.10010.com/essframe"
     post_url="https://bj.cbss.10010.com/acctmanm;"
-    # driver_path="D:/tools/IEDriverServer.exe"
-    driver_path = "Z:/tools/IEDriverServer.exe"
+    driver_path="D:/tools/IEDriverServer.exe"
+    # driver_path = "Z:/tools/IEDriverServer.exe"
     # driver_path = "C:/IEDriverServer.exe"
     userName="bjsc-wangj1"
     passWd="BySh@2019"
@@ -142,7 +141,6 @@ class CbssSpider(scrapy.Spider):
     # 实时/月结账单查询 号段遍历
     def parse_rangeNo(self,response):
         reqeust_url=response.meta['reqeust_url']
-        logging.warning("==========parse_rangeNo============")
         html=etree.HTML(response.body.decode("gbk"))
         time.sleep(10)
         BSS_ACCTMANM_JSESSIONID=html.xpath('//form/@action')[0].split(";")[1]
@@ -158,7 +156,6 @@ class CbssSpider(scrapy.Spider):
         query_month=str(yy)+str(mm)
         # #bulid post method
         post_url=self.post_url+BSS_ACCTMANM_JSESSIONID
-        # headNo='1301171'
         headNo = self.rangeNo
         # for subNo in range(8800,8899):
         for subNo in range(int(self.startNo), int(self.endNo)):
@@ -199,31 +196,38 @@ class CbssSpider(scrapy.Spider):
             'Host':'bj.cbss.10010.com'
         }
         return headers
-    def query_information(self,response):
-        reqeust_url=response.meta['reqeust_url']
-        logging.warning("==========query_information============")
-        html=etree.HTML(response.body.decode("gbk"))
+    def query_integrated_information(self,response):
+
+        html = etree.HTML(response.body.decode("gbk"))
+        logging.warning(response.body.decode("gbk"))
+        # logging.warning(phoneNo)
+        DateField=html.xpath('//input[@name="$DateField"]/@value')[0]
+        _BoInfo=html.xpath('//input[@name="_BoInfo"]/@value')[0]
+        ACCPROVICE_ID=html.xpath('//input[@name="ACCPROVICE_ID"]/@value')[0]
+        allInfo=html.xpath('//input[@name="allInfo"]/@value')[0]
+        phoneNo = response.meta['phoneNo']
+        currentRightCode=html.xpath('//input[@name="currentRightCode"]/@value')[0]
+        Form0 = html.xpath('//input[@name="Form0"]/@value')[0]
+        PROVICE_ID= html.xpath('//input[@name="PROVICE_ID"]/@value')[0]
+        queryTradehide=html.xpath('//input[@name="queryTradehide"]/@value')[0]
+        service=html.xpath('//input[@name="service"]/@value')[0]
+        tabSetList=html.xpath('//input[@name="tabSetList"]/@value')[0]
+        self.custserv_dataForm(DateField,_BoInfo,ACCPROVICE_ID,allInfo,phoneNo,ACCPROVICE_ID,currentRightCode,Form0,PROVICE_ID,queryTradehide,service,tabSetList)
     # 用户资料综合查询 路径
-    def query_integrated_information(self,phoneNo):
+    def get_integrated_information_url(self):
         # 查找到综合信息菜单
         logging.warning("========查找到综合信息菜单==========")
-        logging.warning(phoneNo)
         # logging.warning(self.driver.page_source)
         js_query_total = "var query_acct=document.getElementById('SECOND_MENU_LINK_CSM7000').onclick()"
         self.driver.execute_script(js_query_total)
-        time.sleep(3)
         WebDriverWait(self.driver, 6).until(EC.presence_of_element_located((By.ID, 'CSMB043')))
         clickMenuItem = self.driver.find_element_by_id("CSMB043").get_attribute("onclick")
         clickMenuItem_re = re.findall(r"'([\S\s]+?)'", clickMenuItem)
         logging.warning(clickMenuItem)
         request_url = "https://" + self.province_code + ".cbss.10010.com" + clickMenuItem_re[0] + "&staffId=" + self.userName + "&departId=" + self.depart_id + "&subSysCode=CBS&eparchyCode=0010"
         logging.warning(request_url)
-        cookies=self.get_cookie()
-        headers=self.get_headers()
-        logging.warning(cookies)
-        logging.warning(headers)
-        yield scrapy.FormRequest(request_url, headers=headers, cookies=cookies, callback=self.query_information,
-                             meta={'reqeust_url': request_url})
+        return request_url
+        # yield scrapy.Request(request_url ,headers=headers, cookies=cookies, callback=self.query_information,meta={'reqeust_url': request_url})
     # 实时/月结账单查询 数据解析
     def parse_monthly_bill(self, response):
         response_str=response.body.decode("gbk")
@@ -241,7 +245,9 @@ class CbssSpider(scrapy.Spider):
         else:
             logging.warning(phoneNo+"手机号码有效！")
             # 如果号码为实号，则查询 用户资料综合查询-优惠信息
-            self.query_integrated_information(phoneNo)
+            request_url= self.get_integrated_information_url()
+            yield scrapy.Request(request_url, headers=self.get_headers(), cookies=self.get_cookie(), callback=self.query_integrated_information,
+                                 meta={'phoneNo': phoneNo})
             acctflag=html.xpath("//table/tr/td[2]//text()")[12].strip()
             paytype=html.xpath("//table/tr/td[2]//text()")[13].strip()
             debtfee=html.xpath("//table/tr/td[2]//text()")[14].strip()
