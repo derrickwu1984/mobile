@@ -208,7 +208,7 @@ class CbssSpider(scrapy.Spider):
         # 查找到综合信息菜单
         logging.warning("========查找到综合信息菜单==========")
         logging.warning(phoneNo)
-        logging.warning(self.driver.page_source)
+        # logging.warning(self.driver.page_source)
         js_query_total = "var query_acct=document.getElementById('SECOND_MENU_LINK_CSM7000').onclick()"
         self.driver.execute_script(js_query_total)
         time.sleep(3)
@@ -222,7 +222,7 @@ class CbssSpider(scrapy.Spider):
         headers=self.get_headers()
         logging.warning(cookies)
         logging.warning(headers)
-        yield scrapy.Request(request_url, headers=headers, cookies=cookies, callback=self.parse_rangeNo,
+        yield scrapy.FormRequest(request_url, headers=headers, cookies=cookies, callback=self.query_information,
                              meta={'reqeust_url': request_url})
     # 实时/月结账单查询 数据解析
     def parse_monthly_bill(self, response):
