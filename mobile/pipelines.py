@@ -7,8 +7,8 @@
 import uuid,pymysql
 class MobilePipeline(object):
     def __init__(self):
-        self.conn = pymysql.connect('WIN-EGP38V915TC', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
-        # self.conn = pymysql.connect('localhost', 'root', 'root12#$', 'cbss', charset='utf8', use_unicode=True)
+        # self.conn = pymysql.connect('WIN-EGP38V915TC', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
+        self.conn = pymysql.connect('localhost', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
         self.curor = self.conn.cursor()
         pass
 
