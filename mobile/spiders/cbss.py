@@ -36,8 +36,9 @@ class CbssSpider(scrapy.Spider):
     # 登陆后的链接
     initmy_url = "https://bj.cbss.10010.com/essframe"
     post_url="https://bj.cbss.10010.com/acctmanm;"
-    driver_path="D:/tools/IEDriverServer.exe"
-    # driver_path = "Z:/tools/IEDriverServer.exe"
+    post_discount_url = "https://bj.cbss.10010.com/custserv?service=swallow/personalserv.integratequerytrade.IntegrateQueryTrade/queryTabInfo/1"
+    # driver_path="D:/tools/IEDriverServer.exe"
+    driver_path = "Z:/tools/IEDriverServer.exe"
     # driver_path = "C:/IEDriverServer.exe"
     userName="bjsc-wangj1"
     passWd="BySh@2019"
@@ -46,16 +47,22 @@ class CbssSpider(scrapy.Spider):
     province_id="11"
     driver = webdriver.Ie(driver_path)
     js_exec="var but_click=document.getElementsByClassName('submit')[0].children[0].onclick"
-    cur_month=datetime.datetime.now().month
-    if (cur_month<10):
-        cur_month="0"+str(cur_month)
-    crawldate=str(datetime.datetime.now().year)+cur_month+str(datetime.datetime.now().day)
+
+
 
     def __init__(self,rangeNo,startNo,endNo):
         self.rangeNo=rangeNo
         self.startNo=startNo
         self.endNo=endNo
+        self.cur_month = self.date_Formate(datetime.datetime.now().month)
+        self.cur_day =self.date_Formate(datetime.datetime.now().day)
+        self.crawldate = str(datetime.datetime.now().year) + self.cur_month + self.cur_day
         pass
+    # 将月份、日期小于10的前面补充0
+    def date_Formate(self,object):
+        if (object<10):
+            object="0"+str(object)
+        return object
     def start_requests(self):
         yield scrapy.Request(self.login_url, callback=self.login)
     #     登录逻辑
@@ -175,9 +182,9 @@ class CbssSpider(scrapy.Spider):
                 'referer':reqeust_url,
                 'Host':'bj.cbss.10010.com',
             }
-            time.sleep(3)
+            # time.sleep(3)
+            # 查询月账单信息
             yield scrapy.FormRequest(url=post_url, formdata=data, method="POST",cookies=cookie_billPage, callback=self.parse_monthly_bill,meta={'phoneNo':phoneNo,"headNo":headNo,"query_month":query_month})
-
     # 获取cookie
     def get_cookie(self):
         cookies_dict = {}
@@ -197,11 +204,9 @@ class CbssSpider(scrapy.Spider):
         }
         return headers
     def query_integrated_information(self,response):
-
         html = etree.HTML(response.body.decode("gbk"))
-        logging.warning(response.body.decode("gbk"))
-        # logging.warning(phoneNo)
-        DateField=html.xpath('//input[@name="$DateField"]/@value')[0]
+        logging.warning("===========query_integrated_information==========")
+        DateField=""
         _BoInfo=html.xpath('//input[@name="_BoInfo"]/@value')[0]
         ACCPROVICE_ID=html.xpath('//input[@name="ACCPROVICE_ID"]/@value')[0]
         allInfo=html.xpath('//input[@name="allInfo"]/@value')[0]
@@ -212,22 +217,54 @@ class CbssSpider(scrapy.Spider):
         queryTradehide=html.xpath('//input[@name="queryTradehide"]/@value')[0]
         service=html.xpath('//input[@name="service"]/@value')[0]
         tabSetList=html.xpath('//input[@name="tabSetList"]/@value')[0]
-        self.custserv_dataForm(DateField,_BoInfo,ACCPROVICE_ID,allInfo,phoneNo,ACCPROVICE_ID,currentRightCode,Form0,PROVICE_ID,queryTradehide,service,tabSetList)
+        dataForm=self.custserv_dataForm(DateField,_BoInfo,ACCPROVICE_ID,allInfo,phoneNo,ACCPROVICE_ID,currentRightCode,Form0,PROVICE_ID,queryTradehide,service,tabSetList)
+        post_intetrated_url="https://bj.cbss.10010.com/custserv"
+        yield scrapy.FormRequest(url=post_intetrated_url, formdata=dataForm, method="POST", headers=self.get_headers(),cookies=self.get_cookie(),
+                                 callback=self.get_user_id,meta={'phoneNo': phoneNo},dont_filter=True)
+    def get_user_id(self,response):
+        logging.warning("=============get_user_id===============")
+        html = etree.HTML(response.body.decode("gbk"))
+        USER_ID = html.xpath('//input[@name="USER_ID"]/@value')[0]
+        currentRightCode= html.xpath('//input[@name="currentRightCode"]/@value')[0]
+        phoneNo = response.meta['phoneNo']
+        logging.warning(phoneNo)
+        # 优惠信息posturl
+        dataForm=self.discount_dataForm(currentRightCode,phoneNo,USER_ID)
+        post_discount_url="https://bj.cbss.10010.com/custserv?service=swallow/personalserv.integratequerytrade.IntegrateQueryTrade/queryTabInfo/1"
+        # yield scrapy.FormRequest(url=post_discount_url, formdata=dataForm, method="POST", headers=self.get_headers(),cookies=self.get_cookie(),
+        #                          callback=self.parse_discount_info,meta={'phoneNo': phoneNo},dont_filter=True)
+
+    def get_discount_info(self,response):
+        logging.warning("============get_discount_info============")
+        phoneNo = response.meta['phoneNo']
+        response = response.body.decode()
+        logging.warning(phoneNo)
+        html = bytes(bytearray(response, encoding='utf-8'))
+        html = etree.HTML(html)
+        nodes = html.xpath("//data")
+        for node in nodes:
+            # node.attrib['startdate']
+            # node.attrib['discntcode']
+            # node.attrib['productid']
+            # node.attrib['enddate']
+            # node.attrib['discntname']
+            # node.attrib['itemid']
+            logging.warning(node.attrib['discntexplain'])
+
+
+
     # 用户资料综合查询 路径
     def get_integrated_information_url(self):
         # 查找到综合信息菜单
-        logging.warning("========查找到综合信息菜单==========")
         # logging.warning(self.driver.page_source)
         js_query_total = "var query_acct=document.getElementById('SECOND_MENU_LINK_CSM7000').onclick()"
         self.driver.execute_script(js_query_total)
         WebDriverWait(self.driver, 6).until(EC.presence_of_element_located((By.ID, 'CSMB043')))
         clickMenuItem = self.driver.find_element_by_id("CSMB043").get_attribute("onclick")
         clickMenuItem_re = re.findall(r"'([\S\s]+?)'", clickMenuItem)
-        logging.warning(clickMenuItem)
         request_url = "https://" + self.province_code + ".cbss.10010.com" + clickMenuItem_re[0] + "&staffId=" + self.userName + "&departId=" + self.depart_id + "&subSysCode=CBS&eparchyCode=0010"
-        logging.warning(request_url)
         return request_url
-        # yield scrapy.Request(request_url ,headers=headers, cookies=cookies, callback=self.query_information,meta={'reqeust_url': request_url})
+
     # 实时/月结账单查询 数据解析
     def parse_monthly_bill(self, response):
         response_str=response.body.decode("gbk")
@@ -245,9 +282,13 @@ class CbssSpider(scrapy.Spider):
         else:
             logging.warning(phoneNo+"手机号码有效！")
             # 如果号码为实号，则查询 用户资料综合查询-优惠信息
-            request_url= self.get_integrated_information_url()
-            yield scrapy.Request(request_url, headers=self.get_headers(), cookies=self.get_cookie(), callback=self.query_integrated_information,
-                                 meta={'phoneNo': phoneNo})
+            # request_url= self.get_integrated_information_url()
+            # yield scrapy.Request(request_url, headers=self.get_headers(), cookies=self.get_cookie(), callback=self.query_integrated_information,
+            #                      meta={'phoneNo': phoneNo},dont_filter=True)
+            userid=html.xpath('//input[@name="back_USER_ID"]/@value')[0]
+            dataForm = self.discount_dataForm("csInterquery", phoneNo, userid)
+            yield scrapy.FormRequest(url=self.post_discount_url, formdata=dataForm, method="POST",headers=self.get_headers(), cookies=self.get_cookie(),
+                                      callback=self.get_discount_info,meta={'phoneNo': phoneNo},dont_filter=True)
             acctflag=html.xpath("//table/tr/td[2]//text()")[12].strip()
             paytype=html.xpath("//table/tr/td[2]//text()")[13].strip()
             debtfee=html.xpath("//table/tr/td[2]//text()")[14].strip()
@@ -269,6 +310,7 @@ class CbssSpider(scrapy.Spider):
             # 数据加载到Item
             mobileItemLoader = ItemLoader(item=MobileItem(),response=response)
             mobileItemLoader.add_value("crawldate", self.crawldate)
+            mobileItemLoader.add_value("userid", userid)
             mobileItemLoader.add_value("rangeno", headNo)
             mobileItemLoader.add_value("phoneno", phoneNo)
             mobileItemLoader.add_value("querymonth", query_month)
@@ -287,9 +329,10 @@ class CbssSpider(scrapy.Spider):
             mobileItemLoader.add_value("totalfee",totalfee)
             mobileItemLoader.add_value("actualfee",actualfee)
             userInfo = mobileItemLoader.load_item()
-            # yield userInfo
+            yield userInfo
 
-    # 用户资料综合查询 报文格式
+    # 报文格式
+    # 用户资料综合查询
     def custserv_dataForm(self,DateField,_BoInfo,ACCPROVICE_ID,allInfo,phoneNo,proviceCode,currentRightCode,Form0,PROVICE_ID,queryTradehide,service,tabSetList):
         data={
             "$DateField": DateField,
@@ -336,4 +379,21 @@ class CbssSpider(scrapy.Spider):
             "VIP_CUST_LOYAL_529757_TAG": "0"
         }
         return data
-
+    # 优惠信息查询
+    def discount_dataForm(self,RIGHT_CODE,phoneNo,userId):
+        data={
+            "custId": "",
+            "custName": "",
+            "globalPageName": "personalserv.integratequerytrade.IntegrateQueryTrade",
+            "IDX": "7",
+            "netTypeCode": "50",
+            "passWord": "",
+            "queryMethod": "0",
+            "removeTag": "0",
+            "resNo": "",
+            "RIGHT_CODE": RIGHT_CODE,
+            "serialNumber": phoneNo,
+            "simCard": "null",
+            "userId": userId
+        }
+        return data

@@ -11,6 +11,7 @@ import scrapy
 class MobileItem(scrapy.Item):
     # define the fields for your item here like:
     crawldate = scrapy.Field()
+    userid = scrapy.Field()
     rangeno = scrapy.Field()
     phoneno = scrapy.Field()
     querymonth = scrapy.Field()
