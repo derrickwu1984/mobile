@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from scrapy.loader import  ItemLoader
-from mobile.items import MobileItem
+from mobile.items import MobileItem,DicountItem
 import time,re
 import json
 import datetime
@@ -237,19 +237,22 @@ class CbssSpider(scrapy.Spider):
     def get_discount_info(self,response):
         logging.warning("============get_discount_info============")
         phoneNo = response.meta['phoneNo']
-        response = response.body.decode()
+        response_str = response.body.decode()
         logging.warning(phoneNo)
-        html = bytes(bytearray(response, encoding='utf-8'))
+        html = bytes(bytearray(response_str, encoding='utf-8'))
         html = etree.HTML(html)
         nodes = html.xpath("//data")
         for node in nodes:
-            # node.attrib['startdate']
-            # node.attrib['discntcode']
-            # node.attrib['productid']
-            # node.attrib['enddate']
-            # node.attrib['discntname']
-            # node.attrib['itemid']
-            logging.warning(node.attrib['discntexplain'])
+            discountItemLoader = ItemLoader(item=DicountItem(),response=response)
+            discountItemLoader.add_value("crawldate", self.crawldate)
+            discountItemLoader.add_value("phoneNo", phoneNo)
+            discountItemLoader.add_value("startdate", node.attrib['startdate'])
+            discountItemLoader.add_value("enddate", node.attrib['enddate'])
+            discountItemLoader.add_value("discntcode", node.attrib['discntcode'])
+            discountItemLoader.add_value("productid", node.attrib['productid'])
+            discountItemLoader.add_value("discntname", node.attrib['discntname'])
+            discountInfo = discountItemLoader.load_item()
+            yield discountInfo
 
 
 
@@ -281,14 +284,9 @@ class CbssSpider(scrapy.Spider):
             logging.warning(phoneNo+"手机号未查询到或已被注销！")
         else:
             logging.warning(phoneNo+"手机号码有效！")
-            # 如果号码为实号，则查询 用户资料综合查询-优惠信息
-            # request_url= self.get_integrated_information_url()
-            # yield scrapy.Request(request_url, headers=self.get_headers(), cookies=self.get_cookie(), callback=self.query_integrated_information,
-            #                      meta={'phoneNo': phoneNo},dont_filter=True)
             userid=html.xpath('//input[@name="back_USER_ID"]/@value')[0]
             dataForm = self.discount_dataForm("csInterquery", phoneNo, userid)
-            yield scrapy.FormRequest(url=self.post_discount_url, formdata=dataForm, method="POST",headers=self.get_headers(), cookies=self.get_cookie(),
-                                      callback=self.get_discount_info,meta={'phoneNo': phoneNo},dont_filter=True)
+
             acctflag=html.xpath("//table/tr/td[2]//text()")[12].strip()
             paytype=html.xpath("//table/tr/td[2]//text()")[13].strip()
             debtfee=html.xpath("//table/tr/td[2]//text()")[14].strip()
@@ -330,6 +328,8 @@ class CbssSpider(scrapy.Spider):
             mobileItemLoader.add_value("actualfee",actualfee)
             userInfo = mobileItemLoader.load_item()
             yield userInfo
+            yield scrapy.FormRequest(url=self.post_discount_url, formdata=dataForm, method="POST",headers=self.get_headers(), cookies=self.get_cookie(),
+                                      callback=self.get_discount_info,meta={'phoneNo': phoneNo},dont_filter=True)
 
     # 报文格式
     # 用户资料综合查询

@@ -30,6 +30,12 @@ class MobileItem(scrapy.Item):
     totalfee = scrapy.Field()
     actualfee = scrapy.Field()
 
-
-
-    pass
+# 优惠信息
+class DicountItem(scrapy.Item):
+    crawldate = scrapy.Field()
+    phoneNo = scrapy.Field()
+    startdate = scrapy.Field()
+    enddate = scrapy.Field()
+    discntcode = scrapy.Field()
+    productid = scrapy.Field()
+    discntname = scrapy.Field()

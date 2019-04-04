@@ -66,6 +66,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'mobile.pipelines.MobilePipeline': 1,
+   # 'mobile.pipelines.DiscountPipeline': 1,
 }
 
 # CRITICAL - 严重错误
@@ -94,3 +95,7 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+MYSQL_HOST = "localhost"
+MYSQL_DBNAME= "website"
+MYSQL_USER= "root"
+MYSQL_PASSWD= "root12#$"

@@ -4,35 +4,31 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-import uuid,pymysql
+import uuid,pymysql,logging
+
+from .items import MobileItem,DicountItem
+
+from mobile.db.dbhelper import DBHelper
 class MobilePipeline(object):
     def __init__(self):
         # self.conn = pymysql.connect('WIN-EGP38V915TC', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
-        self.conn = pymysql.connect('localhost', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
-        self.curor = self.conn.cursor()
-        pass
-
+        # self.conn = pymysql.connect('localhost', 'root', 'root12#$', 'website', charset='utf8', use_unicode=True)
+        # self.curor = self.conn.cursor()
+        # pass
+        self.db = DBHelper()
     def process_item(self, item, spider):
-        insert_sql = """
-        insert into mobile_custInfo(object_id,crawldate,userid,rangeno,phoneno,querymonth,
-                                  acctflag,paytype,debtfee,fixtype,
-                                  payname,prodname,fee,openflag,
-                                  custbrand,actualbal,custlocation,creditbal,
-                                  totalfee,actualfee,marketing)
-                       values (%s,%s,%s,%s,%s,
-                                %s,%s,%s,%s,
-                                %s,%s,%s,%s,
-                                %s,%s,%s,%s,
-                                %s,%s,%s,%s)
-            """
+        if (len(item) > 2 and  item.__class__ == MobileItem):
+            logging.warning("MobileItem")
+            self.db.insert_billInfo(item)
+        elif (len(item) > 2 and item.__class__ == DicountItem):
+            logging.warning("DicountItem")
+            self.db.insert_discount(item)
+        return item
+
+class DiscountPipeline(object):
+    def __init__(self):
+        self.db = DBHelper()
+    def process_item(self, item, spider):
         if len(item) > 2:
-                self.curor.execute(insert_sql,
-                                  (str(uuid.uuid1()),item["crawldate"],item["userid"], item["rangeno"], item["phoneno"], item["querymonth"]
-                                    , item["acctflag"], item["paytype"], item["debtfee"], item["fixtype"]
-                                    , item["payname"], item["prodname"], item["fee"], item["openflag"]
-                                    , item["custbrand"], item["actualbal"], item["custlocation"], item["creditbal"]
-                                    , item["totalfee"], item["actualfee"],"O"))
-                self.conn.commit()
-
-
+            self.db.insert_discount(item)
         return item
