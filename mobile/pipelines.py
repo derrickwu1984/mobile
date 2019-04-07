@@ -6,7 +6,7 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import uuid,pymysql,logging
 
-from .items import MobileItem,DicountItem
+from .items import MobileItem,DicountItem,BuyphoneItem
 
 from mobile.db.dbhelper import DBHelper
 class MobilePipeline(object):
@@ -23,6 +23,9 @@ class MobilePipeline(object):
         elif (len(item) > 2 and item.__class__ == DicountItem):
             logging.warning("DicountItem")
             self.db.insert_discount(item)
+        elif (len(item) > 2 and item.__class__ == BuyphoneItem):
+            logging.warning("BuyphoneItem")
+            self.db.insert_buyphone(item)
         return item
 
 class DiscountPipeline(object):

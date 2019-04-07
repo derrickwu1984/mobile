@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from scrapy.loader import  ItemLoader
-from mobile.items import MobileItem,DicountItem
+from mobile.items import MobileItem,DicountItem,BuyphoneItem
 import time,re
 import json
 import datetime
@@ -37,8 +37,8 @@ class CbssSpider(scrapy.Spider):
     initmy_url = "https://bj.cbss.10010.com/essframe"
     post_url="https://bj.cbss.10010.com/acctmanm;"
     post_discount_url = "https://bj.cbss.10010.com/custserv?service=swallow/personalserv.integratequerytrade.IntegrateQueryTrade/queryTabInfo/1"
-    # driver_path="D:/tools/IEDriverServer.exe"
-    driver_path = "Z:/tools/IEDriverServer.exe"
+    driver_path="D:/tools/IEDriverServer.exe"
+    # driver_path = "Z:/tools/IEDriverServer.exe"
     # driver_path = "C:/IEDriverServer.exe"
     userName="bjsc-wangj1"
     passWd="BySh@2019"
@@ -254,6 +254,34 @@ class CbssSpider(scrapy.Spider):
             discountInfo = discountItemLoader.load_item()
             yield discountInfo
 
+    def get_buy_phone_info(self,response):
+        logging.warning("============get_buy_phone_info============")
+        phoneNo = response.meta['phoneNo']
+        response_str = response.body.decode()
+        logging.warning(response_str)
+        logging.warning(phoneNo)
+        html = bytes(bytearray(response_str, encoding='utf-8'))
+        html = etree.HTML(html)
+        nodes = html.xpath("//data")
+        for node in nodes:
+            buyphoneItemLoader = ItemLoader(item=BuyphoneItem(),response=response)
+            buyphoneItemLoader.add_value("crawldate", self.crawldate)
+            buyphoneItemLoader.add_value("phoneNo", phoneNo)
+            buyphoneItemLoader.add_value("bindsaleattr", node.attrib['bindsaleattr'])
+            buyphoneItemLoader.add_value("startdate", node.attrib['startdate'])
+            buyphoneItemLoader.add_value("enddate", node.attrib['enddate'])
+            buyphoneItemLoader.add_value("imei", node.attrib['imei'])
+            buyphoneItemLoader.add_value("foregift", node.attrib['foregift'])
+            buyphoneItemLoader.add_value("devicebrand", node.attrib['devicebrand'])
+            buyphoneItemLoader.add_value("devicename", node.attrib['devicename'])
+            buyphoneItemLoader.add_value("saledesc", node.attrib['saledesc'])
+            buyphoneItemLoader.add_value("devicetype", node.attrib['devicetype'])
+            buyphoneItemLoader.add_value("feeitemcode", node.attrib['feeitemcode'])
+            buyphoneItemLoader.add_value("saleprice", node.attrib['saleprice'])
+            buyphoneItemLoader.add_value("mpfee", node.attrib['mpfee'])
+            buyphoneInfo = buyphoneItemLoader.load_item()
+            yield buyphoneInfo
+
 
 
     # 用户资料综合查询 路径
@@ -285,7 +313,8 @@ class CbssSpider(scrapy.Spider):
         else:
             logging.warning(phoneNo+"手机号码有效！")
             userid=html.xpath('//input[@name="back_USER_ID"]/@value')[0]
-            dataForm = self.discount_dataForm("csInterquery", phoneNo, userid)
+            discount_dataForm = self.discount_dataForm("7","csInterquery", phoneNo, userid)
+            buyphone_dataForm = self.discount_dataForm("13","csInterquery", phoneNo, userid)
 
             acctflag=html.xpath("//table/tr/td[2]//text()")[12].strip()
             paytype=html.xpath("//table/tr/td[2]//text()")[13].strip()
@@ -327,9 +356,14 @@ class CbssSpider(scrapy.Spider):
             mobileItemLoader.add_value("totalfee",totalfee)
             mobileItemLoader.add_value("actualfee",actualfee)
             userInfo = mobileItemLoader.load_item()
+            # 账单信息
             yield userInfo
-            yield scrapy.FormRequest(url=self.post_discount_url, formdata=dataForm, method="POST",headers=self.get_headers(), cookies=self.get_cookie(),
+            # 优惠信息
+            yield scrapy.FormRequest(url=self.post_discount_url, formdata=discount_dataForm, method="POST",headers=self.get_headers(), cookies=self.get_cookie(),
                                       callback=self.get_discount_info,meta={'phoneNo': phoneNo},dont_filter=True)
+            # 购机信息
+            yield scrapy.FormRequest(url=self.post_discount_url, formdata=buyphone_dataForm, method="POST",headers=self.get_headers(), cookies=self.get_cookie(),
+                                      callback=self.get_buy_phone_info,meta={'phoneNo': phoneNo},dont_filter=True)
 
     # 报文格式
     # 用户资料综合查询
@@ -380,12 +414,12 @@ class CbssSpider(scrapy.Spider):
         }
         return data
     # 优惠信息查询
-    def discount_dataForm(self,RIGHT_CODE,phoneNo,userId):
+    def discount_dataForm(self,IDX,RIGHT_CODE,phoneNo,userId):
         data={
             "custId": "",
             "custName": "",
             "globalPageName": "personalserv.integratequerytrade.IntegrateQueryTrade",
-            "IDX": "7",
+            "IDX": IDX,
             "netTypeCode": "50",
             "passWord": "",
             "queryMethod": "0",
@@ -397,3 +431,5 @@ class CbssSpider(scrapy.Spider):
             "userId": userId
         }
         return data
+
+

@@ -75,12 +75,42 @@ class DBHelper():
         query.addErrback(self._handle_error)
         return item
 
+
     def _discountInfo_insert(self,canshu,sql,item):
         # 取出要存入的数据，这里item就是爬虫代码爬下来要存入items内的数据
         params = (str(uuid.uuid1()),item["crawldate"],item["phoneNo"],
                   item["startdate"],item["enddate"], item["discntcode"],
                   item["productid"],item["discntname"])
         canshu.execute(sql, params)
+
+    def insert_buyphone(self,item):
+        insert_sql = """
+        insert into mobile_buyphoneInfo(object_id,crawldate,phoneNo,startdate,
+                                        enddate,bindsaleattr,imei,foregift,
+                                        devicebrand,devicename,saledesc,devicetype,
+                                        feeitemcode,saleprice,mpfee)
+                       values (%s,%s,%s,%s,
+                                %s,%s,%s,%s,
+                                %s,%s,%s,%s,
+                                %s,%s,%s)
+            """
+        # 对象拷贝   深拷贝
+        asynItem = copy.deepcopy(item)
+        # 调用插入的方法
+        query = self.dbpool.runInteraction(self._buyphoneInfo_insert,insert_sql,asynItem)
+        # 调用异常处理方法
+        query.addErrback(self._handle_error)
+        return item
+
+    def _buyphoneInfo_insert(self,canshu,sql,item):
+        # 取出要存入的数据，这里item就是爬虫代码爬下来要存入items内的数据
+        params = (str(uuid.uuid1()),item["crawldate"],item["phoneNo"],
+                  item["startdate"],item["enddate"], item["bindsaleattr"],
+                  item["imei"], item["foregift"], item["devicebrand"],
+                  item["devicename"], item["saledesc"], item["devicetype"],
+                  item["feeitemcode"],item["saleprice"],item["mpfee"])
+        canshu.execute(sql, params)
+
 
     def _handle_error(self,failure):
         logging.warning("--------------database operation exception!!----------------")

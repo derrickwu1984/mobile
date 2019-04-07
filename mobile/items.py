@@ -39,3 +39,20 @@ class DicountItem(scrapy.Item):
     discntcode = scrapy.Field()
     productid = scrapy.Field()
     discntname = scrapy.Field()
+
+
+class BuyphoneItem(scrapy.Item):
+    crawldate = scrapy.Field()
+    phoneNo = scrapy.Field()
+    startdate = scrapy.Field()
+    enddate = scrapy.Field()
+    bindsaleattr = scrapy.Field()
+    imei = scrapy.Field()
+    foregift = scrapy.Field()
+    devicebrand = scrapy.Field()
+    devicename = scrapy.Field()
+    saledesc = scrapy.Field()
+    devicetype = scrapy.Field()
+    feeitemcode = scrapy.Field()
+    saleprice = scrapy.Field()
+    mpfee = scrapy.Field()
