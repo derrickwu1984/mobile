@@ -56,7 +56,7 @@ class CbssSpider(scrapy.Spider):
         self.endNo=endNo
         self.cur_month = self.date_Formate(datetime.datetime.now().month)
         self.cur_day =self.date_Formate(datetime.datetime.now().day)
-        self.crawldate = str(datetime.datetime.now().year) + self.cur_month + self.cur_day
+        self.crawldate = str(datetime.datetime.now().year) + str(self.cur_month) + str(self.cur_day)
         pass
     # 将月份、日期小于10的前面补充0
     def date_Formate(self,object):
