@@ -100,3 +100,8 @@ MYSQL_HOST = "WIN-EGP38V915TC"
 MYSQL_DBNAME= "website"
 MYSQL_USER= "root"
 MYSQL_PASSWD= "root12#$"
+
+#日志文件路径
+# LOG_FILE = "Z:\\Users\\wumingxing\\Desktop\\test.log"
+LOG_FILE = "C:\\test.log"
+LOG_LEVEL = "INFO"
