@@ -91,7 +91,6 @@ class CbssSpider(scrapy.Spider):
         openmenu = self.driver.find_element_by_id("BIL6531").get_attribute("onclick")
         r = re.findall(r"'([\S\s]+?)'", openmenu)
         request_url="https://"+self.province_code+".cbss.10010.com"+r[0]+"&staffId="+self.userName+"&departId="+self.depart_id+"&subSysCode=CBS&eparchyCode=0010"
-        logging.warning(request_url)
         requests.adapters.DEFAULT_RETRIES = 5
         s = requests.session()
         cookies_dict = {}
@@ -205,7 +204,6 @@ class CbssSpider(scrapy.Spider):
         return headers
     def query_integrated_information(self,response):
         html = etree.HTML(response.body.decode("gbk"))
-        logging.warning("===========query_integrated_information==========")
         DateField=""
         _BoInfo=html.xpath('//input[@name="_BoInfo"]/@value')[0]
         ACCPROVICE_ID=html.xpath('//input[@name="ACCPROVICE_ID"]/@value')[0]
