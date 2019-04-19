@@ -163,7 +163,6 @@ class CbssSpider(scrapy.Spider):
         # #bulid post method
         post_url=self.post_url+BSS_ACCTMANM_JSESSIONID
         headNo = self.rangeNo
-        # for subNo in range(8800,8899):
         for subNo in range(int(self.startNo), int(self.endNo)):
             phoneNo=headNo+str(subNo).zfill(4)
             cond_NET_TYPE_CODE=''
