@@ -1,0 +1,41 @@
+
+select * from (
+select b.phoneno as "手机号",b.fixtype as "融合类型",b.payname as "付费名称",b.prodname as "产品名称",b.totalfee as "总计计费应收",b.actualfee  as "总计实际应收" 
+from mobile_discountinfo a,mobile_custinfo b 
+where a.phoneNo=b.phoneno and b.crawldate in( '20190418') and CAST(b.actualfee AS DECIMAL) >"70" and CAST(b.actualfee AS DECIMAL) <="600"
+and  b.payname not like "%公司%" and b.payname not like  "%事务所%" and b.payname not like "%监测站%" 
+and b.payname not like "%银行%" and b.payname not like "%北京%" and b.payname not like "%中国%"
+and b.payname not like "%大使馆%" and b.payname not like "%合伙%" and b.payname not like "%中心%"
+and b.openflag='开通'  
+and b.payname not REGEXP '[a-zA-Z]'
+and b.prodname not in ( 
+'4G-96元后付费基本套餐A-BSS迁转'
+,'4G畅爽冰激凌红卡599元套餐'
+,'4G畅爽冰激凌红卡799元套餐'
+,'4G国内套餐-北京市政务专属220元套餐（合约）'
+,'4G全国流量王8元套餐'
+,'4G全国套餐-396元套餐（施耐德专属）（合约）'
+,'4G全国套餐-空中入网日组包6元产品'
+,'4G全国组合套餐（标准集团）'
+,'4G套餐-30元套餐（京闽琼宁）'
+,'4G主副卡业务-语音副卡基本套餐'
+,'4G组合套餐（标准集团）'
+,'阿里钉钉商务钻石卡（线下）'
+,'阿里钉钉上午金卡（线下）'
+,'北京4G退休员工20元套餐'
+,'北京装维专用50元套餐'
+,'冰激凌（大冰神）'
+,'冰激凌（小冰神）'
+,'冰激凌套餐本地版'
+,'畅爽全国冰激凌套餐398元档'
+,'滴滴网卡MINI版'
+,'滴滴小王卡'
+,'钉钉商务卡-29元套餐（全国）'
+,'钉钉商务卡-49元套餐（全国）'
+,'钉钉商务卡-99元套餐（全国）'
+,'智慧沃家共享版-4G成员套内产品'
+)
+and b.phoneno  not in 
+(select phoneNo from mobile_discountinfo where discntname like "%宽带%" or "%IPVN%")
+group by b.phoneno
+) t 
