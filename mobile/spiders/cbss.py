@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import scrapy,logging,requests,time
+import scrapy,logging,requests,time,pytesseract
 from selenium.webdriver.support.select import Select
+from PIL import Image
 from selenium.webdriver.common.keys import Keys
 from scrapy.http import Request
 from urllib import parse
@@ -38,8 +39,8 @@ class CbssSpider(scrapy.Spider):
     post_url="https://bj.cbss.10010.com/acctmanm;"
     post_discount_url = "https://bj.cbss.10010.com/custserv?service=swallow/personalserv.integratequerytrade.IntegrateQueryTrade/queryTabInfo/1"
     # driver_path="D:/tools/IEDriverServer.exe"
-    # driver_path = "Z:/tools/IEDriverServer.exe"
-    driver_path = "C:/IEDriverServer.exe"
+    driver_path = "Z:/tools/IEDriverServer.exe"
+    # driver_path = "C:/IEDriverServer.exe"
     userName="bjsc-wangj1"
     passWd="BySh@2019"
     province_code = "bj"
@@ -72,9 +73,24 @@ class CbssSpider(scrapy.Spider):
         self.driver.find_element_by_id("STAFF_ID").send_keys(self.userName)
         self.driver.find_element_by_id("LOGIN_PASSWORD").send_keys(self.passWd)
         Select(self.driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value(self.province_id)
-        # captha_input=input(u"请输入验证码:")
-        # VERIFY_CODE_ELE = driver.find_element_by_id("VERIFY_CODE")
-        # VERIFY_CODE_ELE.send_keys(captha_input)
+        self.driver.maximize_window()
+        time.sleep(3)
+        self.driver.save_screenshot('D:/login.png')
+        # 获取验证码元素
+        imageElement = self.driver.find_element_by_id("captureImage")
+        # 获取验证码x、y坐标
+        location = imageElement.location
+        # 获取验证码长度
+        size = imageElement.size
+        rangle = (int(location['x']),int(location['y']),int(location['x']+size['width']),int(location['y']+size['height']))
+        i = Image.open('D:/login.png')
+        result = i.crop(rangle)
+        result.save('D:/1.png')
+        image = Image.open('D:/1.png')
+        result = pytesseract.image_to_string(image)
+        logging.warning('验证码为：{0}'.format(result))
+        self.driver.find_element_by_id("VERIFY_CODE").send_keys(result)
+        self.driver.find_element_by_xpath("//input[@type='button']").click()
         WebDriverWait(self.driver, 1000).until(EC.url_to_be(self.initmy_url))
         logging.warning("恭喜您，您已登录成功了！")
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素

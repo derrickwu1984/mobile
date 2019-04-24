@@ -103,5 +103,5 @@ MYSQL_PASSWD= "root12#$"
 
 #日志文件路径
 # LOG_FILE = "Z:\\Users\\wumingxing\\Desktop\\test.log"
-LOG_FILE = "C:\\test.log"
-LOG_LEVEL = "INFO"
+# LOG_FILE = "C:\\test.log"
+# LOG_LEVEL = "INFO"
