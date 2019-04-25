@@ -74,21 +74,29 @@ class CbssSpider(scrapy.Spider):
         self.driver.find_element_by_id("LOGIN_PASSWORD").send_keys(self.passWd)
         Select(self.driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value(self.province_id)
         self.driver.maximize_window()
+        assert  self.driver.find_element_by_id("dmsg"),"未找到声明部分"
         time.sleep(3)
         self.driver.save_screenshot('D:/login.png')
+        # self.driver.get_screenshot_as_png('d:/login.png')
         # 获取验证码元素
         imageElement = self.driver.find_element_by_id("captureImage")
+        assert imageElement, '未获取到captureImage'
+        logging.warning("imageElement is {0}".format(imageElement))
         # 获取验证码x、y坐标
         location = imageElement.location
         # 获取验证码长度
         size = imageElement.size
+        logging.warning("size = {0}".format(size))
         rangle = (int(location['x']),int(location['y']),int(location['x']+size['width']),int(location['y']+size['height']))
+        logging.warning("rangle = {0}".format(rangle))
         i = Image.open('D:/login.png')
         result = i.crop(rangle)
         result.save('D:/1.png')
         image = Image.open('D:/1.png')
-        result = pytesseract.image_to_string(image)
+        img = image.convert('L')
+        result = pytesseract.image_to_string(img)
         logging.warning('验证码为：{0}'.format(result))
+        assert result,'验证码为空'
         self.driver.find_element_by_id("VERIFY_CODE").send_keys(result)
         self.driver.find_element_by_xpath("//input[@type='button']").click()
         WebDriverWait(self.driver, 1000).until(EC.url_to_be(self.initmy_url))

@@ -1,37 +1,30 @@
-import socket
-import threading
-import time
+from selenium import  webdriver
+from PIL import Image
+from selenium.webdriver.support.select import Select
+import  time,pytesseract,logging
+import numpy as np
 
-activeDegree=dict()
-flag=1
-def main():
-    global activeDegree
-    global glag
-    #获取本机IP地址
-    HOST=socket.gethostbyname(socket.gethostbyname("wxshangw2-085"))
-    #创建原始套接字，适用于Windows平台
-    #对于其他系统，要把socket.IPPROTO_IP替换为socket.IPPROTO_ICMP
-    s=socket.socket(socket.AF_INET,socket.SOCK_RAW,socket.IPPROTO_IP)
-    s.bind((HOST,0))
-    #设置在捕获数据包中含有IP包头
-    s.setsockopt(socket.IPPROTO_IP,socket.IP_HDRINCL,1)
-    #启用混杂模式，捕获所有数据包
-    s.ioctl(socket.SIO_RCVALL,socket.RCVALL_ON)
-    #开始捕获数据包
-    while flag:
-        c=s.recvfrom(65535)
-        host=c[1][0]
-        activeDegree[host]=activeDegree.get(host,0)+1
-        #假设本机ip地址为10.2.1.8
-        if c[1][0] != '172.18.203.197':
-            print(c)
-    #关闭混杂模式
-    s.ioctl(socket.TIO_RCVALL,socket.RCVALL_OFF)
-    s.close()
-t=threading.Thread(target=main)
-t.start()
-time.sleep(60)
-flag=0
-t.join()
-for item in activeDegree.items():
-    print(item)
+import cv2 as cv
+
+
+def read_img():
+    src = cv.imread("D:/2.png")
+    gray = cv.cvtColor(src,cv.COLOR_BGR2GRAY)
+    # 二值化处理
+    ret, im_inv = cv.threshold(gray, 127, 255, cv.THRESH_BINARY_INV)
+    kernel = 1 / 16 * np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]])
+    im_blur = cv.filter2D(im_inv, -1, kernel)
+    # 降噪后，我们对图片再做一轮二值化处理
+    ret, im_res = cv.threshold(im_blur, 127, 255, cv.THRESH_BINARY)
+    # 用opencv的findContours来提取轮廓
+    # im2, contours, hierarchy = cv.findContours(im_res, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    # ret, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV | cv.THRESH_OTSU)
+    # kernel = cv.getStructuringElement(cv.MORPH_RECT, (1, 6))  # 去除线
+    # binl = cv.morphologyEx(binary, cv.MORPH_OPEN, kernel)
+    # kernel = cv.getStructuringElement(cv.MORPH_RECT, (5, 1))
+    # open_out = cv.morphologyEx(binl, cv.MORPH_OPEN, kernel)
+    # cv.bitwise_not(open_out, open_out)  # 背景变为白色
+    cv.imshow("fuck",im_res)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+read_img()
