@@ -27,4 +27,7 @@ def read_img():
     cv.imshow("fuck",im_res)
     cv.waitKey(0)
     cv.destroyAllWindows()
+    textImage = Image.fromarray(im_res)
+    text = pytesseract.image_to_string(textImage)
+    print (text)
 read_img()
