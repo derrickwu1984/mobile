@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import scrapy,logging,requests,time,pytesseract
+import scrapy,logging,requests,time
 from selenium.webdriver.support.select import Select
 from PIL import Image
 from selenium.webdriver.common.keys import Keys

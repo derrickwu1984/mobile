@@ -20,11 +20,8 @@
       <file leaf-file-name="cbss.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mobile/spiders/cbss.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
-              <caret line="43" column="27" lean-forward="true" selection-start-line="43" selection-start-column="27" selection-end-line="43" selection-end-column="27" />
-              <folding>
-                <element signature="e#24#71#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="27">
+              <caret line="1" column="35" selection-start-line="1" selection-start-column="35" selection-end-line="1" selection-end-column="35" />
             </state>
           </provider>
         </entry>
@@ -84,6 +81,8 @@
       <find>time</find>
       <find>sd</find>
       <find>discount_dataForm</find>
+      <find>pytess</find>
+      <find>pytesseract</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -400,11 +399,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mobile/spiders/cbss.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="43" column="27" lean-forward="true" selection-start-line="43" selection-start-column="27" selection-end-line="43" selection-end-column="27" />
-          <folding>
-            <element signature="e#24#71#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="27">
+          <caret line="1" column="35" selection-start-line="1" selection-start-column="35" selection-end-line="1" selection-end-column="35" />
         </state>
       </provider>
     </entry>
