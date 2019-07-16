@@ -54,6 +54,7 @@ RANDOM_UA_TYPE="ie"
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    'mobile.middlewares.MobileDownloaderMiddleware': 299,
+   'mobile.middlewares.ProxyServerMiddleware':1,
 }
 
 # Enable or disable extensions

@@ -1,33 +1,19 @@
-from selenium import  webdriver
-from PIL import Image
-from selenium.webdriver.support.select import Select
-import  time,pytesseract,logging
-import numpy as np
+# from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.ie.options import Options
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
 
-import cv2 as cv
+__browser_url = r'Z:\Users\wumingxing\AppData\Roaming\360se6\Application\360se.exe'  ##360浏览器的地址
+# driver_path = "Z:/tools/chromedriver.exe"
+# driver_path="Z:/Users/wumingxing/Downloads/chromedriver.exe"
+driver_path = "Z:/tools/IEDriverServer.exe"
+option=webdriver.IeOptions()
+# option=webdriver.ChromeOptions()
 
-
-def read_img():
-    src = cv.imread("D:/2.png")
-    gray = cv.cvtColor(src,cv.COLOR_BGR2GRAY)
-    # 二值化处理
-    ret, im_inv = cv.threshold(gray, 127, 255, cv.THRESH_BINARY_INV)
-    kernel = 1 / 16 * np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]])
-    im_blur = cv.filter2D(im_inv, -1, kernel)
-    # 降噪后，我们对图片再做一轮二值化处理
-    ret, im_res = cv.threshold(im_blur, 127, 255, cv.THRESH_BINARY)
-    # 用opencv的findContours来提取轮廓
-    # im2, contours, hierarchy = cv.findContours(im_res, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    # ret, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV | cv.THRESH_OTSU)
-    # kernel = cv.getStructuringElement(cv.MORPH_RECT, (1, 6))  # 去除线
-    # binl = cv.morphologyEx(binary, cv.MORPH_OPEN, kernel)
-    # kernel = cv.getStructuringElement(cv.MORPH_RECT, (5, 1))
-    # open_out = cv.morphologyEx(binl, cv.MORPH_OPEN, kernel)
-    # cv.bitwise_not(open_out, open_out)  # 背景变为白色
-    cv.imshow("fuck",im_res)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
-    textImage = Image.fromarray(im_res)
-    text = pytesseract.image_to_string(textImage)
-    print (text)
-read_img()
+option.binary_location=__browser_url
+# driver=webdriver.Chrome(driver_path,options=option)
+driver=webdriver.Ie(driver_path,options=option)
+driver.get('https://cbss.10010.com')
+time.sleep(10)
+driver.quit()

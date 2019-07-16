@@ -6,9 +6,14 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-import  logging,random
+import  logging,random, base64
 from fake_useragent import UserAgent
-
+#代理服务器
+proxyServer = "http://http-dyn.abuyun.com:9020"
+# 代理隧道验证信息
+proxyUser = "HJA6Q624STG0BN1D"
+proxyPass = "5351A20199BB2066"
+proxyAuth = "Basic " + base64.urlsafe_b64encode(bytes((proxyUser + ":" + proxyPass), "ascii")).decode("utf8")
 
 class MobileSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -103,3 +108,9 @@ class MobileDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+class ProxyServerMiddleware(object):
+    def process_request(self, request, spider):
+        request.meta["proxy"] = proxyServer
+
+        request.headers["Proxy-Authorization"] = proxyAuth
