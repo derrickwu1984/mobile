@@ -11,8 +11,8 @@ from fake_useragent import UserAgent
 #代理服务器
 proxyServer = "http://http-dyn.abuyun.com:9020"
 # 代理隧道验证信息
-proxyUser = "HJA6Q624STG0BN1D"
-proxyPass = "5351A20199BB2066"
+proxyUser = "H6DSM33X8E6U45SD"
+proxyPass = "E06261179D599B9F"
 proxyAuth = "Basic " + base64.urlsafe_b64encode(bytes((proxyUser + ":" + proxyPass), "ascii")).decode("utf8")
 
 class MobileSpiderMiddleware(object):
@@ -114,3 +114,23 @@ class ProxyServerMiddleware(object):
         request.meta["proxy"] = proxyServer
 
         request.headers["Proxy-Authorization"] = proxyAuth
+
+
+class RandomUserAgentMiddlware(object):
+    # 随机跟换user-agent
+    def __init__(self, crawler):
+        super(RandomUserAgentMiddlware, self).__init__()
+        self.ua = UserAgent()
+        self.ua_type = crawler.settings.get('RANDOM_UA_TYPE', 'random')  # 从setting文件中读取RANDOM_UA_TYPE值
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler)
+
+    def process_request(self, request, spider):  ###系统电泳函数
+        def get_ua():
+            return getattr(self.ua, self.ua_type)
+
+        # user_agent_random=get_ua()
+        request.headers.setdefault('User_Agent', get_ua())
+

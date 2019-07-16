@@ -55,6 +55,9 @@ RANDOM_UA_TYPE="ie"
 DOWNLOADER_MIDDLEWARES = {
    'mobile.middlewares.MobileDownloaderMiddleware': 299,
    'mobile.middlewares.ProxyServerMiddleware':1,
+   'mobile.middlewares.RandomUserAgentMiddlware': 2,
+   'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware':None,
+
 }
 
 # Enable or disable extensions
@@ -65,6 +68,7 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+RANDOM_UA_TYPE = 'ie'
 ITEM_PIPELINES = {
    'mobile.pipelines.MobilePipeline': 1,
    # 'mobile.pipelines.DiscountPipeline': 1,
