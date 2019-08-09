@@ -39,12 +39,13 @@ class CbssSpider(scrapy.Spider):
     post_url="https://bj.cbss.10010.com/acctmanm;"
     post_discount_url = "https://bj.cbss.10010.com/custserv?service=swallow/personalserv.integratequerytrade.IntegrateQueryTrade/queryTabInfo/1"
     # driver_path="D:/tools/IEDriverServer.exe"
-    driver_path = "Z:/tools/IEDriverServer.exe"
-    # driver_path = "C:/IEDriverServer.exe"
+    # driver_path = "Z:/tools/IEDriverServer.exe"
+    driver_path = "C:/IEDriverServer.exe"
     userName="bjsc-zhaomx6"
     passWd="wang1985@"
     province_code = "bj"
-    depart_id="11b2pk1"
+    #depart_id="11b2pk1"
+    depart_id = "11b2kv5"
     province_id="11"
     driver = webdriver.Ie(driver_path)
     js_exec="var but_click=document.getElementsByClassName('submit')[0].children[0].onclick"
@@ -69,20 +70,24 @@ class CbssSpider(scrapy.Spider):
     #     登录逻辑
     def login(self, response):
         self.driver.get(self.login_url)
-        time.sleep(3)
+        #time.sleep(3)
         self.driver.find_element_by_id("STAFF_ID").send_keys(self.userName)
         self.driver.find_element_by_id("LOGIN_PASSWORD").send_keys(self.passWd)
         Select(self.driver.find_element_by_name("LOGIN_PROVINCE_CODE")).select_by_value(self.province_id)
         self.driver.maximize_window()
         assert  self.driver.find_element_by_id("dmsg"),"未找到声明部分"
         time.sleep(3)
-        WebDriverWait(self.driver, 1000).until(EC.url_to_be(self.initmy_url))
+        WebDriverWait(self.driver, 60).until(EC.url_to_be(self.initmy_url))
         logging.warning("恭喜您，您已登录成功了！")
+        time.sleep(30)
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
-        WebDriverWait(self.driver, 600).until(EC.presence_of_element_located((By.ID, 'navframe')))
+        logging.warning(self.driver.current_url)
+        logging.warning(self.driver.page_source)
+        WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.ID, 'navframe')))
         self.driver.switch_to.frame("navframe")
         # time.sleep(30)
-        WebDriverWait(self.driver, 600).until(EC.presence_of_element_located((By.ID,'SECOND_MENU_LINK_BIL6500')))
+
+        WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.ID,'SECOND_MENU_LINK_BIL6500')))
         # in order to find CSM1001
         js_query_acct="var query_acct=document.getElementById('SECOND_MENU_LINK_BIL6500').onclick()"
         self.driver.execute_script(js_query_acct)

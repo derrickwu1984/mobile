@@ -27,7 +27,7 @@ CONCURRENT_REQUESTS = 100
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY = 2
+DOWNLOAD_DELAY = 2
 # The download delay setting will honor only one of:
 CONCURRENT_REQUESTS_PER_DOMAIN = 100
 CONCURRENT_REQUESTS_PER_IP = 100
@@ -54,15 +54,11 @@ RANDOM_UA_TYPE="ie"
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    'mobile.middlewares.MobileDownloaderMiddleware': 299,
-   # 'mobile.middlewares.ProxyServerMiddleware':1,
-   'mobile.middlewares.RandomUserAgentMiddlware': 2,
-   'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware':None,
-
+   'mobile.middlewares.RandomUserAgentMiddlware': 543,
+   'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
-""" 启用阿布云限速设置 """
-AUTOTHROTTLE_ENABLED = True
-AUTOTHROTTLE_START_DELAY = 0.2  # 初始下载延迟
-DOWNLOAD_DELAY = 0.2  # 每次请求间隔时间
+
+
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/toMobileDownloaderMiddlewarepics/extensions.html
 #EXTENSIONS = {
@@ -71,7 +67,6 @@ DOWNLOAD_DELAY = 0.2  # 每次请求间隔时间
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-RANDOM_UA_TYPE = 'ie'
 ITEM_PIPELINES = {
    'mobile.pipelines.MobilePipeline': 1,
    # 'mobile.pipelines.DiscountPipeline': 1,
@@ -103,9 +98,10 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-MYSQL_HOST = "localhost"
-# MYSQL_HOST = "WIN-EGP38V915TC"
+# MYSQL_HOST = "localhost"
+MYSQL_HOST = "WIN-EGP38V915TC"
 MYSQL_DBNAME= "website"
+# MYSQL_DBNAME= "mysql"
 MYSQL_USER= "root"
 MYSQL_PASSWD= "root12#$"
 
