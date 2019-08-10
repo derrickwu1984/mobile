@@ -1,9 +1,9 @@
 @echo off & color 02
-echo ÇëÊäÈëÒª²éÑ¯µÄ7Î»ÁªÍ¨ÊÖ»úºÅ¶Î£º
+echo è¯·è¾“å…¥7ä½æ‰‹æœºå·å·æ®µ
 set /p phoneNo=
 Z:
-cd Z:\projects\envs\mobile\mobile 
-cmd /k "workon crawl && python main.py %phoneNo%"
+cd E:\projects\mobile\mobile
+cmd /k "workon ess && python main.py %phoneNo%"
 
 
 

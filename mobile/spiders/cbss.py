@@ -38,9 +38,9 @@ class CbssSpider(scrapy.Spider):
     initmy_url = "https://bj.cbss.10010.com/essframe"
     post_url="https://bj.cbss.10010.com/acctmanm;"
     post_discount_url = "https://bj.cbss.10010.com/custserv?service=swallow/personalserv.integratequerytrade.IntegrateQueryTrade/queryTabInfo/1"
-    # driver_path="D:/tools/IEDriverServer.exe"
+    driver_path="D:/tools/IEDriverServer.exe"
     # driver_path = "Z:/tools/IEDriverServer.exe"
-    driver_path = "C:/IEDriverServer.exe"
+    # driver_path = "C:/IEDriverServer.exe"
     userName="bjsc-zhaomx6"
     passWd="wang1985@"
     province_code = "bj"
@@ -81,8 +81,8 @@ class CbssSpider(scrapy.Spider):
         logging.warning("恭喜您，您已登录成功了！")
         time.sleep(30)
         # 如果没有使用此行代码，则无法找到页面frame中的任何页面元素
-        logging.warning(self.driver.current_url)
-        logging.warning(self.driver.page_source)
+        # logging.warning(self.driver.current_url)
+        # logging.warning(self.driver.page_source)
         WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.ID, 'navframe')))
         self.driver.switch_to.frame("navframe")
         # time.sleep(30)
